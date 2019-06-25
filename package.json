@@ -1,0 +1,22 @@
+{
+  "name": "node-js-server",
+  "version": "1.0.0",
+  "description": "Node JS Server",
+  "main": "server.js",
+  "dependencies": {
+    "@google-cloud/datastore": "^3.1.2",
+    "@google-cloud/trace-agent": "3.6.0",
+    "@webcomponents/webcomponentsjs": "^2.2.10",
+    "body-parser": "1.19.0",
+    "cookie-parser": "^1.4.4",
+    "decimal.js": "10.1.1",
+    "express": "4.16.4",
+    "firebase-admin": "^7.3.0",
+    "logging-js": "git+https://bitbucket.org/cbn-it/logging-js.git",
+    "uuid": "3.3.2"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://voloaca_octavian@bitbucket.org/cbn-it/node-js-server.git"
+  }
+}
