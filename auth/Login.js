@@ -11,12 +11,13 @@ class Login extends Servlet {
         return "/login";
     }
     async execute(){
-        let index = fs.readFileSync(path.join(__dirname, '../../' + BASE + this.indexFile), 'utf8');
+        console.log(path.join(__dirname, '../../../' + BASE + this.indexFile));
+        let index = fs.readFileSync(path.join(__dirname, '../../../' + BASE + this.indexFile), 'utf8');
         let data = await this._getData();
         this.res.send(index.replace('"data_to_replace"', _stringify(data)));
     }
     get indexFile() {
-        return '../../login.html';
+        return '/login.html';
     }
 
     async _getData() {

@@ -6,9 +6,9 @@ function getServlets(folderPaths){
     folderPaths.forEach(folderPath => {
         fs.readdirSync(folderPath).forEach(function(file) {
             let servlet = require(`${folderPath}/${file}`);
-            if (servlet.prototype instanceof Servlet) {
+            // if (servlet.prototype instanceof Servlet) {
                 servlets.push(servlet);
-            }
+            // }
         });
     });
     return servlets;

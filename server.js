@@ -8,10 +8,11 @@ const app = express();
 
 const getServlets = require('./utils/mapping-url.js');
 const mappingUrls = getServlets([
-    path.join(__dirname, "./save"),
-    path.join(__dirname, "./index"),
-    path.join(__dirname, "./get"),
-    path.join(__dirname, "./auth"),
+    path.join(__dirname, "/auth"),
+    path.join(__dirname, "../../server/save"),
+    path.join(__dirname, "../../server/index"),
+    path.join(__dirname, "../../server/get"),
+    // path.join(__dirname, "../../server/auth"),
 ]);
 const cookieParser = require('cookie-parser');
 app.use(cookieParser());
@@ -22,9 +23,8 @@ app.use(requestParam);
 const PORT = process.env.PORT || 8080;
 const NODE_ENV = process.env.NODE_ENV;
 const BASE = (NODE_ENV === 'development') ? 'build/dev/' : '';
-
-app.use('/node_modules', express.static(path.join(__dirname, '../' + BASE + 'node_modules')));
-app.use('/web', express.static(path.join(__dirname, '../web')));
+app.use('/node_modules', express.static(path.join(__dirname, '../../' + BASE + 'node_modules')));
+app.use('/web', express.static(path.join(__dirname, '../../web')));
 
 
 app.listen(PORT, () => {

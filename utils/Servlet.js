@@ -1,8 +1,11 @@
 const {getCircularReplacer} = require('./Utils');
 const admin = require('firebase-admin');
-admin.initializeApp({
-    credential: admin.credential.cert(require('./../credentials/firebase.json'))
-});
+if(admin.apps.length === 0){
+
+    admin.initializeApp({
+        projectId: process.env.NODE_ENV.GOOGLE_CLOUD_PROJECT
+    });
+}
 const db = admin.firestore();
 
 
