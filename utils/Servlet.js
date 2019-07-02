@@ -1,7 +1,6 @@
 const {getCircularReplacer} = require('./Utils');
 const admin = require('firebase-admin');
 if(admin.apps.length === 0){
-    console.log(process.env.GOOGLE_CLOUD_PROJECT);
     admin.initializeApp({
         projectId: process.env.GOOGLE_CLOUD_PROJECT
     });

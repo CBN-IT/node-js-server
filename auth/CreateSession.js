@@ -7,6 +7,7 @@ class CreateSession extends Servlet {
     }
 
     async execute() {
+        console.log(process.env.GOOGLE_CLOUD_PROJECT);
         if (this.req.param.csrfToken !== this.req.cookies.csrfToken) {
             console.log(this.req.param.csrfToken, this.req.cookies.csrfToken);
             this.res.status(401).send('UNAUTHORIZED REQUEST!');
