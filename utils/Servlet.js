@@ -3,7 +3,7 @@ const admin = require('firebase-admin');
 if(admin.apps.length === 0){
 
     admin.initializeApp({
-        projectId: process.env.NODE_ENV.GOOGLE_CLOUD_PROJECT
+        projectId: process.env.GOOGLE_CLOUD_PROJECT
     });
 }
 const db = admin.firestore();
