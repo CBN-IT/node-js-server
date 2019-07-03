@@ -44,7 +44,7 @@ class Servlet{
             if(user == null){
                 this._account = null;
             } else if(this._isAdmin(user)){
-                this._account = Object.assign(user, {tipCont: 'SuperAdmin', _firmId: _firmId ? _firmId : this.req.param['_firmId']})
+                this._account = Object.assign(user, {tipCont: 'SuperAdmin', _firmId: _firmId ? _firmId : this.req.param['_firmId'], emailCont: user['email']})
             } else {
                 let snapshot = await this.db.collection('account').
                 where('_deleted', '==', null).
