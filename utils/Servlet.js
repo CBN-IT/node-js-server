@@ -24,7 +24,7 @@ class Servlet{
         return Servlet._db;
     }
     get requiredLogin(){
-        return false;
+        return true;
     }
     async getUser() {
         if (this._user === undefined) {
@@ -37,12 +37,36 @@ class Servlet{
         }
         return this._user;
     }
+
+    async getAccount(_firmId){
+        if(this._account === undefined){
+            let user = await this.getUser();
+            if(user == null){
+                this._account = null;
+            } else if(this._isAdmin(user)){
+                this._account = Object.assign(user, {tipCont: 'SuperAdmin', _firmId: _firmId ? _firmId : this.req.param['_firmId']})
+            } else {
+                let snapshot = await this.db.collection('account').
+                where('_deleted', '==', null).
+                where('_firmId', '==', _firmId ? _firmId : this.req.param['_firmId']).
+                where('emailCont', '==', user.email).get();
+                let accounts = this.processDocuments(snapshot, 'account');
+                this._account = accounts.length > 0 ? accounts[0] : null;
+            }
+        }
+        return this._account;
+    }
+
+    _isAdmin(user){
+        return user !== null && (user.email === 'octavianvoloaca@gmail.com' || user.email === 'bogdan.nourescu@cbn-it.ro');
+    }
+
     async validate(){
         return true;
     }
 
     async checkLogin() {
-        if (this.requiredLogin && await this.getUser() === null) {
+        if (this.requiredLogin && await this.getAccount() === null) {
             throw new Error("Invalid user");
         }
     }
