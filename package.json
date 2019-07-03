@@ -13,7 +13,8 @@
     "express": "4.16.4",
     "firebase-admin": "^7.3.0",
     "logging-js": "git+https://bitbucket.org/cbn-it/logging-js.git",
-    "uuid": "3.3.2"
+    "uuid": "3.3.2",
+    "@sendgrid/mail": "^6.4.0"
   },
   "repository": {
     "type": "git",
