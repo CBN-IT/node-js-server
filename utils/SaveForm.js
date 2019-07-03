@@ -101,7 +101,7 @@ class SaveForm{
 
         //get from file
         try{
-            let contents = fs.readFileSync(path.join(__dirname, `../configs/${collection}.json` ), 'utf8');
+            let contents = fs.readFileSync(path.join(__dirname, `../../../server/configs/${collection}.json` ), 'utf8');
             return JSON.parse(contents);
         } catch(err){
             this.servletInstance.logger.w(`No config found for ${collection}`);
