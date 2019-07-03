@@ -9,6 +9,8 @@ const app = express();
 const getServlets = require('./utils/mapping-url.js');
 const mappingUrls = getServlets([
     path.join(__dirname, "/auth"),
+    path.join(__dirname, "/get"),
+    path.join(__dirname, "/save"),
     path.join(__dirname, "../../server/save"),
     path.join(__dirname, "../../server/index"),
     path.join(__dirname, "../../server/get"),
