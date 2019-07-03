@@ -1,5 +1,5 @@
 const Servlet = require('./../utils/Servlet.js');
-const SaveForm = require('./SaveForm.js');
+const SaveForm = require('./../utils/SaveForm.js');
 class SaveAccount extends Servlet {
 
     static get url(){

@@ -11,7 +11,7 @@ class GetForms extends Servlet {
     async execute(){
         let collection = 'form';
         let _firmId = this.req.param['_firmId'];
-        let forms = await this._getForms('configs', collection, _firmId, false);
+        let forms = await this._getForms('server/configs', collection, _firmId, false);
         this.sendAsJson(Object.values(forms));
     }
 
@@ -31,7 +31,7 @@ class GetForms extends Servlet {
 
     _getConfigs(folderName){
         let configs = {};
-        let folderPath = `../${folderName}`;
+        let folderPath = `../../../${folderName}`;
         fs.readdirSync(path.join(__dirname, folderPath)).forEach(file => {
             configs[file.split('.')[0]] = new Function("return " + fs.readFileSync(path.join(__dirname, `./${folderPath}/${file}`), 'utf8'))();
         });
