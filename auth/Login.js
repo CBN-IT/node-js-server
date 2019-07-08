@@ -11,7 +11,7 @@ class Login extends Servlet {
         return "/login";
     }
 
-    get requiredLogn(){
+    get requiredLogin(){
         return false;
     }
 
