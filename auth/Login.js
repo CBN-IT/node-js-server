@@ -10,12 +10,18 @@ class Login extends Servlet {
     static get url(){
         return "/login";
     }
+
+    get requiredLogn(){
+        return false;
+    }
+
     async execute(){
         console.log(path.join(__dirname, '../../../' + BASE + this.indexFile));
         let index = fs.readFileSync(path.join(__dirname, '../../../' + BASE + this.indexFile), 'utf8');
         let data = await this._getData();
         this.res.send(index.replace('"data_to_replace"', _stringify(data)));
     }
+
     get indexFile() {
         return '/login.html';
     }
