@@ -6,6 +6,10 @@ class CreateSession extends Servlet {
         return '/CreateSession';
     }
 
+    get requiredLogn(){
+        return false;
+    }
+
     async execute() {
         console.log(process.env.GOOGLE_CLOUD_PROJECT);
         if (this.req.param.csrfToken !== this.req.cookies.csrfToken) {
