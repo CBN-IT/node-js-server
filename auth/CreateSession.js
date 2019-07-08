@@ -6,7 +6,7 @@ class CreateSession extends Servlet {
         return '/CreateSession';
     }
 
-    get requiredLogn(){
+    get requiredLogin(){
         return false;
     }
 
