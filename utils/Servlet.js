@@ -107,6 +107,7 @@ class Servlet{
             if(keys.length > 1){
                 data[keys[0]] = data[keys[0]] ? data[keys[0]] : {};
                 data[keys[0]][keys[1]] = value;
+                delete data[key];
             }
         });
         return data;
