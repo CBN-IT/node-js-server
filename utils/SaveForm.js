@@ -89,6 +89,7 @@ class SaveForm{
             newData[`${field.name}.nume_judet`] = this.servletInstance.req.param[`${field.name}.nume_judet`];
             newData[`${field.name}.id`] = this.servletInstance.req.param[`${field.name}.id`];
             newData[`${field.name}.ancestor`] = this.servletInstance.req.param[`${field.name}.ancestor`];
+            newData[`${field.name}.label`] = this.servletInstance.req.param[`${field.name}_label`];
             newData[`${field.name}_label`] = this.servletInstance.req.param[`${field.name}_label`];
         } else {
             newData[`${field.name}.nume_localitate`] = '';
@@ -96,6 +97,7 @@ class SaveForm{
             newData[`${field.name}.nume_judet`] = '';
             newData[`${field.name}.id`] = '';
             newData[`${field.name}.ancestor`] = '';
+            newData[`${field.name}.label`] = '';
             newData[`${field.name}_label`] = '';
         }
     }
