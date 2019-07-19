@@ -105,10 +105,11 @@ class Servlet{
         Object.entries(data).forEach(([key, value]) => {
             let keys = key.split('.');
             if(keys.length > 1){
-                data[keys[0]] = data[keys[0]] ? {} : data[keys[0]];
+                data[keys[0]] = data[keys[0]] ? data[keys[0]] : {};
                 data[keys[0]][keys[1]] = value;
             }
         });
+        return data;
     }
 
     async updateDocument(_firmId, collection, _id, newData, merge) {
