@@ -45,6 +45,10 @@ class SaveForm{
     _processData(config){
         let newData = {_deleted: null};
         config.elements.forEach(field => {
+            if(field['dbType'] === 'address'){
+                this._processAdress(newData, field);
+                return;
+            }
             let value = this.servletInstance.req.param[field.name];
             if(value !== undefined){
                 switch (field['dbType']){
@@ -66,9 +70,6 @@ class SaveForm{
                         break;
                     case 'list':
                         newData[field.name] = value;
-                        break;
-                    case 'file':
-
                 }
             }
             if(field.type === 'select' && field['saveLabel']){
@@ -79,6 +80,24 @@ class SaveForm{
             newData._label = config.label.map(property => newData[property]).join(" ");
         }
         return newData;
+    }
+
+    _processAdress(newData, field){
+        if(this.servletInstance.req.param[`${field.name}.id`]){
+            newData[`${field.name}.nume_localitate`] = this.servletInstance.req.param[`${field.name}.nume_localitate`];
+            newData[`${field.name}.nume_superior`] = this.servletInstance.req.param[`${field.name}.nume_superior`];
+            newData[`${field.name}.nume_judet`] = this.servletInstance.req.param[`${field.name}.nume_judet`];
+            newData[`${field.name}.id`] = this.servletInstance.req.param[`${field.name}.id`];
+            newData[`${field.name}.ancestor`] = this.servletInstance.req.param[`${field.name}.ancestor`];
+            newData[`${field.name}_label`] = this.servletInstance.req.param[`${field.name}_label`];
+        } else {
+            newData[`${field.name}.nume_localitate`] = '';
+            newData[`${field.name}.nume_superior`] = '';
+            newData[`${field.name}.nume_judet`] = '';
+            newData[`${field.name}.id`] = '';
+            newData[`${field.name}.ancestor`] = '';
+            newData[`${field.name}_label`] = '';
+        }
     }
 
     async _getConfig(_firmId, collection){
