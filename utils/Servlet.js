@@ -95,9 +95,20 @@ class Servlet{
     processDocuments(snapshot, path){
         let toReturn = [];
         snapshot.forEach(doc => {
-            toReturn.push({_id: doc.id, path: path, ...doc.data()});
+            let processedData = this._processData(doc.data());
+            toReturn.push({_id: doc.id, path: path, ...processedData});
         });
         return toReturn;
+    }
+
+    _processData(data){
+        Object.entries(data).forEach(([key, value]) => {
+            let keys = key.split('.');
+            if(keys.length > 1){
+                data[keys[0]] = data[keys[0]] ? {} : data[keys[0]];
+                data[keys[0]][keys[1]] = value;
+            }
+        });
     }
 
     async updateDocument(_firmId, collection, _id, newData, merge) {
