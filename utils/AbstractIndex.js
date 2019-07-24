@@ -15,7 +15,7 @@ class AbstractIndex extends GetForms{
     }
 
     async execute(){
-        if(await this.getUser() === null){
+        if(await this.getAccount() === null){
             this.res.redirect('/login');
             return;
         }

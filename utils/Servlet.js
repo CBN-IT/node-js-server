@@ -46,10 +46,12 @@ class Servlet{
             } else if(this._isAdmin(user)){
                 this._account = Object.assign(user, {tipCont: 'SuperAdmin', _firmId: _firmId ? _firmId : this.req.param['_firmId'], emailCont: user['email']})
             } else {
-                let snapshot = await this.db.collection('account').
-                where('_deleted', '==', null).
-                where('_firmId', '==', _firmId ? _firmId : this.req.param['_firmId']).
-                where('emailCont', '==', user.email).get();
+                let snapshot = this.db.collection('account').where('_deleted', '==', null).where('emailCont', '==', user.email);
+                _firmId =_firmId ? _firmId : this.req.param['_firmId'];
+                if(_firmId ){
+                    snapshot = snapshot.where('_firmId', '==', _firmId ? _firmId : this.req.param['_firmId']);
+                }
+                snapshot = await snapshot.get();
                 let accounts = this.processDocuments(snapshot, 'account');
                 this._account = accounts.length > 0 ? accounts[0] : null;
             }
