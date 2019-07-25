@@ -70,15 +70,21 @@ class SaveForm{
                         break;
                     case 'list':
                         newData[field.name] = value;
+                        break;
+                    case 'file':
+                        newData[field.name] = value;
+                        newData[field.name+"_urls"] = this.servletInstance.req.param[field.name+"_urls"];
+                        break;
                 }
             }
-            if(field.type === 'select' && field['saveLabel']){
+            if(field.type === 'select' && field['saveLabel'] && this.servletInstance.req.param[`${field.name}_label`]){
                 newData[`${field.name}_label`] = this.servletInstance.req.param[`${field.name}_label`];
             }
         });
         if(config.label){
             newData._label = config.label.map(property => newData[property]).join(" ");
         }
+        // this.servletInstance.logger.i(config);
         return newData;
     }
 
