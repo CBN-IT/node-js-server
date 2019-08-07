@@ -8,8 +8,8 @@ class SaveForm{
 
     async getUpdatedData(){
         let collection = this.servletInstance.req.param['collection'];
-        let _firmId = this.servletInstance.req.param['_firmId'];
-        let config = await this._getConfig(_firmId, collection);
+        let _companyId = this.servletInstance.req.param['_companyId'];
+        let config = await this._getConfig(_companyId, collection);
         return config.uniqueId ? {data: this._processData(config), uniqueId : config.uniqueId} : this._processData(config);
     }
 
@@ -24,19 +24,19 @@ class SaveForm{
     async _processSave(newData, merge){
         let _id = this.servletInstance.req.param['_id'];
         newData = newData ? newData : await this.getUpdatedData();
-        let _firmId = this.servletInstance.req.param['_firmId'];
+        let _companyId = this.servletInstance.req.param['_companyId'];
         let collection = this.servletInstance.req.param['collection'];
-        return await this._updateDocument(_firmId, collection, _id, newData, merge)
+        return await this._updateDocument(_companyId, collection, _id, newData, merge)
     }
 
-    async _updateDocument(_firmId, collection, _id, newData, merge) {
+    async _updateDocument(_companyId, collection, _id, newData, merge) {
         _id = !_id && newData.uniqueId ? newData.data[newData.uniqueId] : _id;
         newData = newData.uniqueId  ? newData.data : newData;
         if (_id !== undefined) {
-            await this.servletInstance.db.collection(_firmId !== 'default' ? `firm/${_firmId}/${collection}`: collection).doc(_id).set(newData, {merge: !!merge});
+            await this.servletInstance.db.collection(_companyId !== 'default' ? `company/${_companyId}/${collection}`: collection).doc(_id).set(newData, {merge: !!merge});
             return {...newData, _id};
         } else {
-            let response = await this.servletInstance.db.collection(_firmId !== 'default' ? `firm/${_firmId}/${collection}` : collection).add(newData);
+            let response = await this.servletInstance.db.collection(_companyId !== 'default' ? `company/${_companyId}/${collection}` : collection).add(newData);
             return {...newData, _id: response.id}
         }
     }
@@ -108,11 +108,11 @@ class SaveForm{
         }
     }
 
-    async _getConfig(_firmId, collection){
+    async _getConfig(_companyId, collection){
 
         //get from namespace
-        if(_firmId !== 'default'){
-            let snapshot = await this.servletInstance.db.collection(`firm/${_firmId}/form`).where('collection', '==', collection).get();
+        if(_companyId !== 'default'){
+            let snapshot = await this.servletInstance.db.collection(`company/${_companyId}/form`).where('collection', '==', collection).get();
             let config = this.servletInstance.processDocuments(snapshot)[0];
             if(config){
                 return JSON.parse(config.code);

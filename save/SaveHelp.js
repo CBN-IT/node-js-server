@@ -15,7 +15,7 @@ class SaveHelp extends Servlet {
     async execute(){
         let saveForm = new SaveForm(this);
         let newData = {date: moment().format("YYYY-MM-DD"), ...await saveForm.getUpdatedData()};
-        let response = await saveForm._updateDocument(this.req.param._firmId, this.req.param.collection, this.req.param._id, newData, false);
+        let response = await saveForm._updateDocument(this.req.param._companyId, this.req.param.collection, this.req.param._id, newData, false);
         await this.sendHelpMail(newData);
         this.sendAsJson(response);
     }
@@ -23,11 +23,11 @@ class SaveHelp extends Servlet {
     async sendHelpMail(document){
         let html = `
             <div>Proiect: ${process.env.GOOGLE_CLOUD_PROJECT}</div>
-            <div>Firma: ${this.req.param._firmId}</div>
+            <div>Firma: ${this.req.param._companyId}</div>
             <div>User: ${(await this.getAccount())['emailCont']}</div>
             <div>Mesaj: ${document.message}</div>
         `;
-        return SendGrid.sendHtmlMail(['octavianvoloaca@gmail.com', 'bogdan.noureescu@cbn-it.ro'], 'office@cbn-it.ro', `Solicitare ajutor - ${this.req.param._firmId}`, html);
+        return SendGrid.sendHtmlMail(['octavianvoloaca@gmail.com', 'bogdan.noureescu@cbn-it.ro'], 'office@cbn-it.ro', `Solicitare ajutor - ${this.req.param._companyId}`, html);
     }
 
 }

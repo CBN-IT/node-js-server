@@ -25,12 +25,12 @@ class AbstractIndex extends GetForms{
     }
 
     async _getData(){
-        let snapshot = await this.db.collection('firm').where('_deleted', '==', null).get();
-        let firms = [...this.processDocuments(snapshot), {_id: 'default', firmName: 'Default'}];
-        let _firmId = this.req.param['firmId'] === 'default' ? 'default' : this.req.param['firmId'] ? this.req.param['firmId'] : firms[0]._id;
-        let forms = await this._getForms('server/configs', 'form', _firmId, true);
-        let columns = await this._getForms('server/columns', 'columns', _firmId, true);
-        let reports = await this._getReports('report', _firmId, true);
+        let snapshot = await this.db.collection('company').where('_deleted', '==', null).get();
+        let companies = [...this.processDocuments(snapshot), {_id: 'default', companyName: 'Default'}];
+        let _companyId = this.req.param['_companyId'] === 'default' ? 'default' : this.req.param['_companyId'] ? this.req.param['_companyId'] : companies[0]._id;
+        let forms = await this._getForms('server/configs', 'form', _companyId, true);
+        let columns = await this._getForms('server/columns', 'columns', _companyId, true);
+        let reports = await this._getReports('report', _companyId, true);
 
 
         // let invoiceSettings = await this.getDocument(_firmId, 'setari', 'setariFactura');
@@ -40,23 +40,23 @@ class AbstractIndex extends GetForms{
             _configs: forms,
             _columns: columns,
             _reports: reports,
-            _firms: firms,
-            _selectedFirm: _firmId,
+            _companies: companies,
+            _selectedCompany: _companyId,
             _user: await this.getUser()
-        }, await this.getData(_firmId));
+        }, await this.getData(_companyId));
     }
 
-    getData(_firmId){
+    getData(_companyId){
         return {};
     }
 
-    async _getReports(collection, _firmId){
+    async _getReports(collection, _companyId){
         let snapshotDefault = await this.db.collection(collection).where('_deleted', '==', null).get();
         let allReports = this.processDocuments(snapshotDefault, 'report');
 
-        if(_firmId !== 'default'){
-            let snapshot = await this.db.collection(`firm/${_firmId}/${collection}`).where('_deleted', '==', null).get();
-            let reports = this.processDocuments(snapshot, `firm/${_firmId}/${collection}`);
+        if(_companyId !== 'default'){
+            let snapshot = await this.db.collection(`company/${_companyId}/${collection}`).where('_deleted', '==', null).get();
+            let reports = this.processDocuments(snapshot, `company/${_companyId}/${collection}`);
             allReports = [...allReports, ...reports];
         }
 

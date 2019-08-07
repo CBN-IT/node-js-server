@@ -10,19 +10,19 @@ class GetForms extends Servlet {
 
     async execute(){
         let collection = 'form';
-        let _firmId = this.req.param['_firmId'];
-        let forms = await this._getForms('server/configs', collection, _firmId, false);
+        let _companyId = this.req.param['_companyId'];
+        let forms = await this._getForms('server/configs', collection, _companyId, false);
         this.sendAsJson(Object.values(forms));
     }
 
-    async _getForms(folderName, collection, _firmId, justJSON){
+    async _getForms(folderName, collection, _companyId, justJSON){
         let formsFromFile = this._getConfigs(folderName);
         let snapshotDefault = await this.db.collection(collection).where('_deleted', '==', null).get();
         let formsDefault = this.processDocuments(snapshotDefault);
         let forms = [];
 
-        if(_firmId !== 'default'){
-            let snapshot = await this.db.collection(`firm/${_firmId}/${collection}`).where('_deleted', '==', null).get();
+        if(_companyId !== 'default'){
+            let snapshot = await this.db.collection(`company/${_companyId}/${collection}`).where('_deleted', '==', null).get();
             forms = this.processDocuments(snapshot);
         }
 

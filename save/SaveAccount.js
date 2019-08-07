@@ -7,15 +7,15 @@ class SaveAccount extends Servlet {
     }
 
     async execute(){
-        let _firmId = this.req.param['_firmId'];
-        this.req.param['_firmId'] = 'default';
+        let _companyId = this.req.param['_companyId'];
+        this.req.param['_companyId'] = 'default';
         let saveForm = new SaveForm(this);
         let newData = await saveForm.getUpdatedData();
-        newData._firmId = _firmId;
-        let firm = await this.db.collection('firm').doc(_firmId).get();
-        newData._firmName = firm.data().firmName;
+        newData._companyId = _companyId;
+        let company = await this.db.collection('company').doc(_companyId).get();
+        newData._companyName = company.data().companyName;
         await saveForm.save(newData);
-        this.sendAsJson({message: 'Saved Firm'});
+        this.sendAsJson({message: 'Saved Company'});
 
     }
 }

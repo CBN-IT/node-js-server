@@ -8,7 +8,7 @@ class SaveReport extends Servlet {
     async execute(){
         let collection = 'report';
         let _id = this.req.param['_id'];
-        let _firmId = this.req.param['_firmId'];
+        let _companyId = this.req.param['_companyId'];
         let newData = {
             'reportName': this.req.param['reportName'],
             'type': this.req.param['type'],
@@ -18,7 +18,7 @@ class SaveReport extends Servlet {
             'params': this.req.param['params'],
             '_deleted': null
         };
-        let document = await this.updateDocument(_firmId, collection, _id, newData);
+        let document = await this.updateDocument(_companyId, collection, _id, newData);
         this.sendAsJson(document)
     }
 

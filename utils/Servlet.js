@@ -38,18 +38,18 @@ class Servlet{
         return this._user;
     }
 
-    async getAccount(_firmId){
+    async getAccount(_companyId){
         if(this._account === undefined){
             let user = await this.getUser();
             if(user == null){
                 this._account = null;
             } else if(this._isAdmin(user)){
-                this._account = Object.assign(user, {tipCont: 'SuperAdmin', _firmId: _firmId ? _firmId : this.req.param['_firmId'], emailCont: user['email']})
+                this._account = Object.assign(user, {tipCont: 'SuperAdmin', _companyId: _companyId ? _companyId : this.req.param['_companyId'], emailCont: user['email']})
             } else {
                 let snapshot = this.db.collection('account').where('_deleted', '==', null).where('emailCont', '==', user.email);
-                _firmId =_firmId ? _firmId : this.req.param['_firmId'];
-                if(_firmId ){
-                    snapshot = snapshot.where('_firmId', '==', _firmId ? _firmId : this.req.param['_firmId']);
+                _companyId =_companyId ? _companyId : this.req.param['_companyId'];
+                if(_companyId ){
+                    snapshot = snapshot.where('_companyId', '==', _companyId ? _companyId : this.req.param['_companyId']);
                 }
                 snapshot = await snapshot.get();
                 let accounts = this.processDocuments(snapshot, 'account');
@@ -115,18 +115,18 @@ class Servlet{
         return data;
     }
 
-    async updateDocument(_firmId, collection, _id, newData, merge) {
+    async updateDocument(_companyId, collection, _id, newData, merge) {
         let doc;
         if (_id !== undefined) {
-            doc = await this.db.collection(_firmId !== 'default' ? `firm/${_firmId}/${collection}` : collection).doc(_id).set(newData, {merge: !!merge});
+            doc = await this.db.collection(_companyId !== 'default' ? `company/${_companyId}/${collection}` : collection).doc(_id).set(newData, {merge: !!merge});
         } else {
-            doc = await this.db.collection(_firmId !== 'default' ? `firm/${_firmId}/${collection}` : collection).add(newData);
+            doc = await this.db.collection(_companyId !== 'default' ? `company/${_companyId}/${collection}` : collection).add(newData);
         }
         return {_id: _id ? _id : doc.id, ...newData};
     }
 
-    async getDocument(_firmId, collection, _id){
-        let doc = await this.db.collection(_firmId !== 'default' ? `firm/${_firmId}/${collection}` : collection).doc(_id).get();
+    async getDocument(_companyId, collection, _id){
+        let doc = await this.db.collection(_companyId !== 'default' ? `company/${_companyId}/${collection}` : collection).doc(_id).get();
         if(doc.exists){
             return {_id: doc.id, ...doc.data()};
         }

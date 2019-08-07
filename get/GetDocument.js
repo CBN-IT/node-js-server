@@ -7,11 +7,11 @@ class GetDocument extends Servlet {
 
     async execute(){
         let collection = this.req.param['collection'];
-        let _firmId = this.req.param['_firmId'];
+        let _companyId = this.req.param['_companyId'];
         let _id = this.req.param['_id'];
         let document = {};
 
-        let doc = await this.db.collection(_firmId !== 'default' ? `firm/${_firmId}/${collection}` : collection).doc(_id).get();
+        let doc = await this.db.collection(_companyId !== 'default' ? `firm/${_companyId}/${collection}` : collection).doc(_id).get();
 
         if(doc.exists){
             document = {_id: doc.id, ...doc.data()};
