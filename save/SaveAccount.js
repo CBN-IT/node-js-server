@@ -15,7 +15,7 @@ class SaveAccount extends Servlet {
         let company = await this.db.collection('company').doc(_companyId).get();
         newData._companyName = company.data().companyName;
         await saveForm.save(newData);
-        this.sendAsJson({message: 'Saved Company'});
+        this.sendAsJson({message: 'Saved Account'});
 
     }
 }
