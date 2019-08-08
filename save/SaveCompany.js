@@ -7,6 +7,7 @@ class SaveCompany extends Servlet {
 
     async execute(){
         this.req.param['_companyId'] = 'default';
+        this.req.param['collection'] = 'company';
         await this.save();
         /*this.sendAsJson({message: 'Execute method implemented'})
 
