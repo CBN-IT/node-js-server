@@ -2,7 +2,7 @@ const Servlet = require('./../utils/Servlet');
 class SaveCompany extends Servlet {
 
     static get url(){
-        return '/SaveFirm';
+        return '/SaveCompany';
     }
 
     async execute(){
