@@ -117,7 +117,7 @@ class Servlet{
 
     async updateDocument(_companyId, collection, _id, newData, merge) {
         let doc;
-        if (_id !== undefined) {
+        if (_id !== undefined && _id !== '') {
             doc = await this.db.collection(_companyId !== 'default' ? `company/${_companyId}/${collection}` : collection).doc(_id).set(newData, {merge: !!merge});
         } else {
             doc = await this.db.collection(_companyId !== 'default' ? `company/${_companyId}/${collection}` : collection).add(newData);
