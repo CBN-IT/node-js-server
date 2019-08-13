@@ -25,7 +25,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: false}));
 
 app.use(multer.any());
-app.use(sendUploadToGCS(process.env.GOOGLE_CLOUD_PROJECT));//jshnfkjhsdkjfhkljsdhfkjsdhjkfd
+app.use(sendUploadToGCS(`${process.env.GOOGLE_CLOUD_PROJECT}.appspot.com`));//jshnfkjhsdkjfhkljsdhfkjsdhjkfd
 
 app.use(requestParam);
 
