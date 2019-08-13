@@ -15,7 +15,8 @@
     "logging-js": "git+https://bitbucket.org/cbn-it/logging-js.git",
     "uuid": "3.3.2",
     "@sendgrid/mail": "^6.4.0",
-    "moment": "2.24.0"
+    "moment": "2.24.0",
+    "multer": "1.4.1"
   },
   "repository": {
     "type": "git",

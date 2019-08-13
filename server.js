@@ -6,6 +6,8 @@ const {logginMiddleware} = require('logging-js');
 const fs = require(`fs`);
 const app = express();
 
+const {sendUploadToGCS,multer} = require('./utils/file-uploat-gcs.js');
+
 const getServlets = require('./utils/mapping-url.js');
 const mappingUrls = getServlets([
     path.join(__dirname, "/auth"),
@@ -19,7 +21,12 @@ const mappingUrls = getServlets([
 const cookieParser = require('cookie-parser');
 app.use(cookieParser());
 app.use(logginMiddleware());
+app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: false}));
+
+app.use(multer.any());
+app.use(sendUploadToGCS(process.env.GOOGLE_CLOUD_PROJECT));//jshnfkjhsdkjfhkljsdhfkjsdhjkfd
+
 app.use(requestParam);
 
 const PORT = process.env.PORT || 8080;
