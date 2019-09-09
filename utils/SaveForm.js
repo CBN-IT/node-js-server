@@ -15,7 +15,6 @@ class SaveForm{
     }
 
     async _processSave(newData, merge){
-        this.config = this.config ? this.config : await this._getConfig();
 
         let _id = this.servletInstance.req.param['_id'];
         newData = newData ? newData : await this.getUpdatedData();
@@ -25,6 +24,7 @@ class SaveForm{
     }
 
     async getUpdatedData(){
+        this.config = this.config ? this.config : await this._getConfig();
         return this.config.uniqueId ? {data: this._processData(this.config), uniqueId : this.config.uniqueId} : this._processData(this.config);
     }
 
