@@ -6,13 +6,6 @@ class SaveForm{
         this.servletInstance = servletInstance;
     }
 
-    async getUpdatedData(){
-        let collection = this.servletInstance.req.param['collection'];
-        let _companyId = this.servletInstance.req.param['_companyId'];
-        let config = await this._getConfig(_companyId, collection);
-        return config.uniqueId ? {data: this._processData(config), uniqueId : config.uniqueId} : this._processData(config);
-    }
-
     async saveWithMerge(newData){
         return this._processSave(newData, true);
     }
@@ -22,11 +15,17 @@ class SaveForm{
     }
 
     async _processSave(newData, merge){
+        this.config = this.config ? this.config : await this._getConfig();
+
         let _id = this.servletInstance.req.param['_id'];
         newData = newData ? newData : await this.getUpdatedData();
         let _companyId = this.servletInstance.req.param['_companyId'];
         let collection = this.servletInstance.req.param['collection'];
         return await this._updateDocument(_companyId, collection, _id, newData, merge)
+    }
+
+    async getUpdatedData(){
+        return this.config.uniqueId ? {data: this._processData(this.config), uniqueId : this.config.uniqueId} : this._processData(this.config);
     }
 
     async _updateDocument(_companyId, collection, _id, newData, merge) {
@@ -108,8 +107,9 @@ class SaveForm{
         }
     }
 
-    async _getConfig(_companyId, collection){
-
+    async _getConfig(){
+        let collection = this.servletInstance.req.param['collection'];
+        let _companyId = this.servletInstance.req.param['_companyId'];
         //get from namespace
         if(_companyId !== 'default'){
             let snapshot = await this.servletInstance.db.collection(`company/${_companyId}/form`).where('collection', '==', collection).get();
@@ -136,6 +136,35 @@ class SaveForm{
             return null;
         }
 
+    }
+
+    async setConfig(collection){
+        let _companyId = this.servletInstance.req.param['_companyId'];
+        //get from namespace
+        if(_companyId !== 'default'){
+            let snapshot = await this.servletInstance.db.collection(`company/${_companyId}/form`).where('collection', '==', collection).get();
+            let config = this.servletInstance.processDocuments(snapshot)[0];
+            if(config){
+                return JSON.parse(config.code);
+            }
+        }
+
+        //get from empty namespace
+        let snapshotDefault = await this.servletInstance.db.collection('form').where('collection', '==', collection).get();
+        let configDefault = this.servletInstance.processDocuments(snapshotDefault)[0];
+        if(configDefault){
+            return JSON.parse(configDefault.code);
+        }
+
+        //get from file
+        try{
+            let contents = fs.readFileSync(path.join(__dirname, `../../../server/configs/${collection}.json` ), 'utf8');
+            return JSON.parse(contents);
+        } catch(err){
+            this.servletInstance.logger.w(`No config found for ${collection}`);
+            console.log(`No config found for ${collection}`);
+            return null;
+        }
     }
 
 }
