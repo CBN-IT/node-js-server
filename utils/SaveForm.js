@@ -138,7 +138,7 @@ class SaveForm{
 
     }
 
-    async _setConfig(collection){
+    async setConfig(collection){
         this.config = await this._getConfig(collection);
     }
 
