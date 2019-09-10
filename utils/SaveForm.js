@@ -2,8 +2,9 @@ const path = require('path');
 const fs = require("fs");
 class SaveForm{
 
-    constructor(servletInstance){
+    constructor(servletInstance, collection){
         this.servletInstance = servletInstance;
+        this.collection = collection ? collection : this.servletInstance.req.param['collection'];
     }
 
     async saveWithMerge(newData){
@@ -19,8 +20,7 @@ class SaveForm{
         let _id = this.servletInstance.req.param['_id'];
         newData = newData ? newData : await this.getUpdatedData();
         let _companyId = this.servletInstance.req.param['_companyId'];
-        let collection = this.servletInstance.req.param['collection'];
-        return await this._updateDocument(_companyId, collection, _id, newData, merge)
+        return await this._updateDocument(_companyId, this.collection, _id, newData, merge)
     }
 
     async getUpdatedData(){
