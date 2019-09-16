@@ -25,7 +25,7 @@ class SaveForm{
 
     async getUpdatedData(){
         this.config = this.config ? this.config : await this._getConfig();
-        return this.config.uniqueId ? {data: this._processData(this.config), uniqueId : this.config.uniqueId} : this._processData(this.config);
+        return this.config.uniqueId && this.config.uniqueId !== '' ? {data: this._processData(this.config), uniqueId : this.config.uniqueId} : this._processData(this.config);
     }
 
     async _updateDocument(_companyId, collection, _id, newData, merge) {
