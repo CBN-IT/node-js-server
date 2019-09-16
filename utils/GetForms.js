@@ -50,13 +50,12 @@ class GetForms extends Servlet {
                 }
         });
 
-
         formsDefault.forEach(form => {
-            form.code = justJSON ? JSON.parse(form.code) : form.code;
+            form.code = justJSON ? form.code : form.code;
             formsFromFile[form.collection] = justJSON ? form.code : form;
         });
         forms.forEach(form => {
-            form.code = justJSON ? JSON.parse(form.code) : form.code;
+            form.code = justJSON ? form.code : form.code;
             formsFromFile[form.collection] = justJSON ? form.code : form;
         });
 
