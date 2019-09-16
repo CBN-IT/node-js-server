@@ -83,19 +83,20 @@ class SaveForm{
         if(config.label){
             newData._label = config.label.map(property => newData[property]).join(" ");
         }
+        console.log(newData);
         // this.servletInstance.logger.i(config);
         return newData;
     }
 
     _processAdress(newData, field){
         if(this.servletInstance.req.param[`${field.name}.id`]){
-            newData[`${field.name}.nume_localitate`] = this.servletInstance.req.param[`${field.name}.nume_localitate`];
-            newData[`${field.name}.nume_superior`] = this.servletInstance.req.param[`${field.name}.nume_superior`];
-            newData[`${field.name}.nume_judet`] = this.servletInstance.req.param[`${field.name}.nume_judet`];
-            newData[`${field.name}.id`] = this.servletInstance.req.param[`${field.name}.id`];
-            newData[`${field.name}.ancestor`] = this.servletInstance.req.param[`${field.name}.ancestor`];
-            newData[`${field.name}.label`] = this.servletInstance.req.param[`${field.name}_label`];
-            newData[`${field.name}_label`] = this.servletInstance.req.param[`${field.name}_label`];
+            // newData[`${field.name}.nume_localitate`] = this.servletInstance.req.param[`${field.name}.nume_localitate`];
+            // newData[`${field.name}.nume_superior`] = this.servletInstance.req.param[`${field.name}.nume_superior`];
+            // newData[`${field.name}.nume_judet`] = this.servletInstance.req.param[`${field.name}.nume_judet`];
+            // newData[`${field.name}.id`] = this.servletInstance.req.param[`${field.name}.id`];
+            // newData[`${field.name}.ancestor`] = this.servletInstance.req.param[`${field.name}.ancestor`];
+            // newData[`${field.name}.label`] = this.servletInstance.req.param[`${field.name}_label`];
+            // newData[`${field.name}_label`] = this.servletInstance.req.param[`${field.name}_label`];
             newData[field.name] = {
                 nume_localitate: this.servletInstance.req.param[`${field.name}.nume_localitate`],
                 nume_superior: this.servletInstance.req.param[`${field.name}.nume_superior`],
@@ -105,13 +106,13 @@ class SaveForm{
                 label: this.servletInstance.req.param[`${field.name}.label`]
             };
         } else {
-            newData[`${field.name}.nume_localitate`] = '';
-            newData[`${field.name}.nume_superior`] = '';
-            newData[`${field.name}.nume_judet`] = '';
-            newData[`${field.name}.id`] = '';
-            newData[`${field.name}.ancestor`] = '';
-            newData[`${field.name}.label`] = '';
-            newData[`${field.name}_label`] = '';
+            // newData[`${field.name}.nume_localitate`] = '';
+            // newData[`${field.name}.nume_superior`] = '';
+            // newData[`${field.name}.nume_judet`] = '';
+            // newData[`${field.name}.id`] = '';
+            // newData[`${field.name}.ancestor`] = '';
+            // newData[`${field.name}.label`] = '';
+            // newData[`${field.name}_label`] = '';
             newData[field.name] = {
                 nume_localitate: '',
                 nume_superior: '',
