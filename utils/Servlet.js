@@ -46,7 +46,7 @@ class Servlet{
             } else if(this._isAdmin(user)){
                 this._account = Object.assign(user, {tipCont: 'SuperAdmin', _companyId: _companyId ? _companyId : this.req.param['_companyId'], emailCont: user['email']})
             } else {
-                let snapshot = this.db.collection('account').where('_deleted', '==', null).where('emailCont', '==', user.email);
+                let snapshot = this.db.collection('account').where('_deleted', '==', null).where('accountEmail', '==', user.email);
                 _companyId =_companyId ? _companyId : this.req.param['_companyId'];
                 if(_companyId ){
                     snapshot = snapshot.where('_companyId', '==', _companyId ? _companyId : this.req.param['_companyId']);
