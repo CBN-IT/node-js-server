@@ -96,14 +96,14 @@ class SaveForm{
             // newData[`${field.name}.id`] = this.servletInstance.req.param[`${field.name}.id`];
             // newData[`${field.name}.ancestor`] = this.servletInstance.req.param[`${field.name}.ancestor`];
             // newData[`${field.name}.label`] = this.servletInstance.req.param[`${field.name}_label`];
-            // newData[`${field.name}_label`] = this.servletInstance.req.param[`${field.name}_label`];
+            newData[`${field.name}_label`] = this.servletInstance.req.param[`${field.name}_label`];
             newData[field.name] = {
                 nume_localitate: this.servletInstance.req.param[`${field.name}.nume_localitate`],
                 nume_superior: this.servletInstance.req.param[`${field.name}.nume_superior`],
                 nume_judet: this.servletInstance.req.param[`${field.name}.nume_judet`],
                 id: this.servletInstance.req.param[`${field.name}.id`],
                 ancestor: this.servletInstance.req.param[`${field.name}.ancestor`],
-                label: this.servletInstance.req.param[`${field.name}.label`]
+                label: this.servletInstance.req.param[`${field.name}_label`]
             };
         } else {
             // newData[`${field.name}.nume_localitate`] = '';
@@ -112,7 +112,7 @@ class SaveForm{
             // newData[`${field.name}.id`] = '';
             // newData[`${field.name}.ancestor`] = '';
             // newData[`${field.name}.label`] = '';
-            // newData[`${field.name}_label`] = '';
+            newData[`${field.name}_label`] = '';
             newData[field.name] = {
                 nume_localitate: '',
                 nume_superior: '',
