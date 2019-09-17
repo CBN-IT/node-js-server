@@ -83,7 +83,6 @@ class SaveForm{
         if(config.label){
             newData._label = config.label.map(property => newData[property]).join(" ");
         }
-        console.log(newData);
         // this.servletInstance.logger.i(config);
         return newData;
     }
