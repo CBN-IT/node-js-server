@@ -1,8 +1,7 @@
-const GetForms = require('./GetForms.js');
+const GetForms = require('../get/GetForms.js');
 const {_stringify} = require('./Utils.js');
-const path = require('path');
 const fs = require("fs");
-const BASE = process.env.NODE_ENV === 'development' ? 'build/dev/' : '';
+
 
 class AbstractIndex extends GetForms{
 
@@ -19,7 +18,7 @@ class AbstractIndex extends GetForms{
             this.res.redirect('/login');
             return;
         }
-        let index = fs.readFileSync(path.join(__dirname, '../../../' + BASE + this.indexFile), 'utf8');
+        let index = fs.readFileSync(global.projectRoot + this.indexFile, 'utf8');
         let data = await this._getData();
         this.res.send(index.replace('"data_to_replace"', _stringify(data)));
     }

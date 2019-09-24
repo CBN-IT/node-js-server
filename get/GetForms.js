@@ -1,7 +1,6 @@
 const Servlet = require('./../utils/Servlet.js');
-const path = require('path');
 const fs = require("fs");
-const {_stringify} = require('./../utils/Utils.js');
+
 class GetForms extends Servlet {
 
     static get url(){
@@ -31,9 +30,9 @@ class GetForms extends Servlet {
 
     _getConfigs(folderName){
         let configs = {};
-        let folderPath = `../../../${folderName}`;
-        fs.readdirSync(path.join(__dirname, folderPath)).forEach(file => {
-            configs[file.split('.')[0]] = new Function("return " + fs.readFileSync(path.join(__dirname, `./${folderPath}/${file}`), 'utf8'))();
+        let folderPath = global.projectRoot+`${folderName}`;
+        fs.readdirSync(folderPath).forEach(file => {
+            configs[file.split('.')[0]] = new Function("return " + fs.readFileSync(`${folderPath}/${file}`, 'utf8'))();
         });
         return configs;
     }
@@ -51,11 +50,9 @@ class GetForms extends Servlet {
 
 
         formsDefault.forEach(form => {
-            form.code = justJSON ? JSON.parse(form.code) : form.code;
             formsFromFile[form.collection] = justJSON ? form.code : form;
         });
         forms.forEach(form => {
-            form.code = justJSON ? JSON.parse(form.code) : form.code;
             formsFromFile[form.collection] = justJSON ? form.code : form;
         });
 
