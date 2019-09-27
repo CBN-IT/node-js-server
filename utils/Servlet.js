@@ -138,6 +138,19 @@ class Servlet{
         return {};
     }
 
+    async getDocuments(_companyId, collection, _ids){
+        let docRefs = _ids.map(_id => this.db.collection(`company/${_companyId}/${collection}`).doc(_id));
+        let snapshot = await this.db.getAll(...docRefs);
+        let docs = snapshot.map(doc => {return {_id: doc.id, ...doc.data()}});
+        return docs;
+    }
+
+    async runQuery(_companyId, collection, conditions){
+        let query = this.db.collection(`company/${_companyId}/${collection}`).where('_deleted', '==', null);
+        conditions.forEach(condition => query = query.where(condition[0], condition[1], condition[2]));
+        return this.processDocuments(await query.get());
+    }
+
 }
 Servlet._db = db;
 module.exports = Servlet;
