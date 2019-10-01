@@ -130,6 +130,10 @@ class Servlet{
         return {_id: _id ? _id : doc.id, ...newData};
     }
 
+    deleteDocument(_companyId, collection, _id) {
+        return this.updateDocument(_companyId, collection, _id, {deleted: new Date()}, true);
+    }
+
     async getDocument(_companyId, collection, _id){
         let doc = await this.db.collection(_companyId !== 'default' ? `company/${_companyId}/${collection}` : collection).doc(_id).get();
         if(doc.exists){
