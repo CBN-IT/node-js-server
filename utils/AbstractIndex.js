@@ -1,9 +1,9 @@
-const GetForms = require('../get/GetForms.js');
+const GetConfigs = require('../get/GetConfigs.js');
 const {_stringify} = require('./Utils.js');
 const fs = require("fs");
 
 
-class AbstractIndex extends GetForms{
+class AbstractIndex extends GetConfigs{
 
     get indexFile(){
         return 'index.html';
