@@ -18,7 +18,7 @@ const getCircularReplacer = () => {
 
 const requestParam = (req, res, next) => {
     req.param = {};
-    Object.assign(req.param, req.body, req.query);
+    Object.assign(req.param, req.body, req.query,req.params);
     next();
 };
 
