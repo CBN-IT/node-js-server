@@ -1,17 +1,17 @@
 const Servlet = require('./../utils/Servlet.js');
 const fs = require("fs");
 
-class GetForms extends Servlet {
+class GetColumns extends Servlet {
 
     static get url(){
-        return '/GetForms';
+        return '/GetColumns';
     }
 
     async execute(){
-        let collection = 'form';
+        let collection = 'column';
         let _companyId = this.req.param['_companyId'];
-        let forms = await this._getForms('server/configs', collection, _companyId, false);
-        this.sendAsJson(Object.values(forms));
+        let columns = await this._getForms('server/columns', collection, _companyId, false);
+        this.sendAsJson(Object.values(columns));
     }
 
     async _getForms(folderName, collection, _companyId, justJSON){
@@ -50,15 +50,15 @@ class GetForms extends Servlet {
 
 
         formsDefault.forEach(form => {
-            formsFromFile[form.collection] = justJSON ? JSON.parse(form.code) : form;
+            formsFromFile[form.collection] = justJSON ? form.code : form;
         });
         forms.forEach(form => {
-            formsFromFile[form.collection] = justJSON ? JSON.parse(form.code) : form;
+            formsFromFile[form.collection] = justJSON ? form.code : form;
         });
 
         return formsFromFile;
     }
 }
 
-module.exports = GetForms;
+module.exports = GetColumns;
 
