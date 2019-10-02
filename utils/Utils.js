@@ -18,7 +18,7 @@ const getCircularReplacer = () => {
 
 const requestParam = (req, res, next) => {
     req.param = {};
-    Object.assign(req.param, req.body, req.query);
+    Object.assign(req.param, req.body, req.query,req.params);
     next();
 };
 
@@ -209,12 +209,14 @@ const _stringify = function(data, indent) {
 
         str  = indent;
 
+        str += '"';
         str += data.getUTCFullYear()                + '-';
         str += _format_date(data.getUTCMonth() + 1) + '-';
         str += _format_date(data.getUTCDate())      + 'T';
         str += _format_date(data.getUTCHours())     + ':';
         str += _format_date(data.getUTCMinutes())   + ':';
         str += _format_date(data.getUTCSeconds())   + 'Z';
+        str += '"';
 
     } else if (data instanceof Object) {
 
