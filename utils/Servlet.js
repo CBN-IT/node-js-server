@@ -123,9 +123,9 @@ class Servlet{
         });
         let doc;
         if (_id !== undefined && _id !== '') {
-            doc = await this.db.collection(_companyId !== 'default' ? `company/${_companyId}/${collection}` : collection).doc(_id).set(newData, {merge: !!merge});
+            doc = await this.db.collection(_companyId !== 'default' && _companyId !== '' ? `company/${_companyId}/${collection}` : collection).doc(_id).set(newData, {merge: !!merge});
         } else {
-            doc = await this.db.collection(_companyId !== 'default' ? `company/${_companyId}/${collection}` : collection).add(newData);
+            doc = await this.db.collection(_companyId !== 'default' && _companyId !== '' ? `company/${_companyId}/${collection}` : collection).add(newData);
         }
         return {_id: _id ? _id : doc.id, ...newData};
     }

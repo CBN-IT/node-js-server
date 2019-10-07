@@ -24,9 +24,9 @@ class AbstractIndex extends GetConfigs{
     }
 
     async _getData(){
-        let snapshot = await this.db.collection('company').where('_deleted', '==', null).get();
-        let companies = [...this.processDocuments(snapshot), {_id: 'default', companyName: 'Default'}];
-        let _companyId = this.req.param['_companyId'] === 'default' ? 'default' : this.req.param['_companyId'] ? this.req.param['_companyId'] : companies[0]._id;
+
+        let companies = [...await this.runQuery('', 'company', [['_deleted', '==', null]]), {_id: 'default', companyName: 'Default'}];
+        let _companyId = await this._getDefaultCompany(companies);
         let forms = await this._getForms('server/configs', 'form', _companyId, true);
         let columns = await this._getForms('server/columns', 'columns', _companyId, true);
         let reports = await this._getReports('report', _companyId, true);
@@ -61,6 +61,15 @@ class AbstractIndex extends GetConfigs{
 
         return allReports;
     }
+
+    async _getDefaultCompany(companies){
+        let account = await this.getAccount();
+        let defaultOptions = await this.getDocument('', 'defaultOptions', account.accountEmail);
+        let defaultCompany = this.req.param['_companyId'] ? this.req.param['_companyId'] : defaultOptions.defaultCompany ? defaultOptions.defaultCompany : companies[0]._id;
+        this.updateDocument('', 'defaultOptions', account.accountEmail, {defaultCompany}, true);
+        return defaultCompany;
+    }
+
 }
 
 module.exports = AbstractIndex;
