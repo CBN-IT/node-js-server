@@ -44,7 +44,7 @@ class Servlet{
             if(user == null){
                 this._account = null;
             } else if(this._isAdmin(user)){
-                this._account = Object.assign(user, {tipCont: 'SuperAdmin', _companyId: _companyId ? _companyId : this.req.param['_companyId'], emailCont: user['email']})
+                this._account = Object.assign(user, {tipCont: 'SuperAdmin', _companyId: _companyId ? _companyId : this.req.param['_companyId'], accountEmail: user['email']})
             } else {
                 let snapshot = this.db.collection('account').where('_deleted', '==', null).where('accountEmail', '==', user.email);
                 _companyId =_companyId ? _companyId : this.req.param['_companyId'];
@@ -135,7 +135,7 @@ class Servlet{
     }
 
     async getDocument(_companyId, collection, _id){
-        let doc = await this.db.collection(_companyId !== 'default' ? `company/${_companyId}/${collection}` : collection).doc(_id).get();
+        let doc = await this.db.collection(_companyId !== 'default' && _companyId !== '' ? `company/${_companyId}/${collection}` : collection).doc(_id).get();
         if(doc.exists){
             return {_id: doc.id, ...doc.data()};
         }
@@ -145,8 +145,7 @@ class Servlet{
     async getDocuments(_companyId, collection, _ids){
         let docRefs = _ids.map(_id => this.db.collection(`company/${_companyId}/${collection}`).doc(_id));
         let snapshot = await this.db.getAll(...docRefs);
-        let docs = snapshot.map(doc => {return {_id: doc.id, ...doc.data()}});
-        return docs;
+        return snapshot.map(doc => {return {_id: doc.id, ...doc.data()}});
     }
 
     async runQuery(_companyId, collection, conditions){
