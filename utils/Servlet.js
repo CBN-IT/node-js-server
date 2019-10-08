@@ -11,7 +11,6 @@ const db = admin.firestore();
 // const Datastore = require('@google-cloud/datastore');
 // const db = new Datastore({});
 
-const SaveForm = require('./SaveForm');
 
 class Servlet{
     constructor(req, res){
@@ -83,15 +82,6 @@ class Servlet{
 
     async execute(){
         this.sendAsJson({message: 'Execute method not implemented'})
-    }
-
-    async save(merge){
-        let saveForm = new SaveForm(this);
-        if(merge){
-            return await saveForm.saveWithMerge();
-        } else {
-            return await saveForm.save();
-        }
     }
 
     processDocuments(snapshot, path){

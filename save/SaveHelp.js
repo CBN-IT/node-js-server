@@ -1,8 +1,8 @@
-const Servlet = require('./../utils/Servlet');
 const SaveForm = require('./../utils/SaveForm');
 const SendGrid = require('./../mail/SendGridMail.js');
-const moment = require("moment");
-class SaveHelp extends Servlet {
+const moment = require('moment');
+
+class SaveHelp extends SaveForm {
 
     static get url(){
         return '/SaveHelp';
@@ -13,9 +13,8 @@ class SaveHelp extends Servlet {
     }
 
     async execute(){
-        let saveForm = new SaveForm(this);
-        let newData = {date: moment().format("YYYY-MM-DD"), ...await saveForm.getUpdatedData()};
-        let response = await saveForm._updateDocument(this.req.param._companyId, this.req.param.collection, this.req.param._id, newData, false);
+        let newData = {date: moment().format("YYYY-MM-DD"), ...await this.getUpdatedData()};
+        let response = await this.updateDocument(this.req.param._companyId, this.req.param.collection, this.req.param._id, newData, false);
         await this.sendHelpMail(newData);
         this.sendAsJson(response);
     }
