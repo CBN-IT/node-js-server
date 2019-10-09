@@ -106,6 +106,8 @@ class Servlet{
     }
 
     async updateDocument(_companyId, collection, _id, newData, merge) {
+        _id = !_id && newData.uniqueId ? newData.data[newData.uniqueId] : _id;
+        newData = newData.uniqueId  ? newData.data : newData;
         Object.keys(newData).forEach(key => {
             if(newData[key] === undefined){
                 delete newData[key];
@@ -121,7 +123,7 @@ class Servlet{
     }
 
     deleteDocument(_companyId, collection, _id) {
-        return this.updateDocument(_companyId, collection, _id, {deleted: new Date()}, true);
+        return this.updateDocument(_companyId, collection, _id, {_deleted: new Date()}, true);
     }
 
     async getDocument(_companyId, collection, _id){
