@@ -17,7 +17,7 @@ class SaveForm extends Servlet {
         let _id = this.req.param['_id'];
         newData = newData ? newData : await this.getUpdatedData();
         let _companyId = this.req.param['_companyId'];
-        return await this.updateDocument(_companyId, this.collection, _id, newData, merge)
+        return await this.updateDocument(_companyId, this.req.param.collection, _id, newData, merge)
     }
 
     async getUpdatedData(){
