@@ -22,10 +22,10 @@ class SaveForm extends Servlet {
 
     async getUpdatedData(){
         this.config = this.config ? this.config : await this._getConfig();
-        return this.config.uniqueId && this.config.uniqueId !== '' ? {data: this._processData(this.config), uniqueId : this.config.uniqueId} : this._processData(this.config);
+        return this.config.uniqueId && this.config.uniqueId !== '' ? {data: this._getFormData(this.config), uniqueId : this.config.uniqueId} : this._getFormData(this.config);
     }
 
-    _processData(config){
+    _getFormData(config){
         let newData = {_deleted: null};
         config.elements.forEach(field => {
             if(field['dbType'] === 'address'){
