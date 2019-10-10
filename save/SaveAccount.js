@@ -17,5 +17,6 @@ class SaveAccount extends SaveForm {
         this.sendAsJson({message: 'Saved Account'});
 
     }
+
 }
 module.exports = SaveAccount;
