@@ -150,5 +150,4 @@ class Servlet{
     }
 
 }
-Servlet._db = db;
 module.exports = Servlet;
