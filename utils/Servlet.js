@@ -1,16 +1,5 @@
 const {getCircularReplacer} = require('./Utils');
 const admin = require('firebase-admin');
-if(admin.apps.length === 0){
-    admin.initializeApp({
-        projectId: process.env.GOOGLE_CLOUD_PROJECT
-    });
-}
-const db = admin.firestore();
-
-
-// const Datastore = require('@google-cloud/datastore');
-// const db = new Datastore({});
-
 
 class Servlet{
     constructor(req, res){
@@ -18,14 +7,26 @@ class Servlet{
         this.req = req;
         this.logger = this.req.log;
         this._companyId = this.req.param._companyId;
+        this.initializeAppAndDatabase();
     }
 
     get db(){
         return Servlet._db;
     }
+
     get requiredLogin(){
         return true;
     }
+
+    initializeAppAndDatabase(){
+            if(admin.apps.length === 0){
+                admin.initializeApp({
+                    projectId: process.env.GOOGLE_CLOUD_PROJECT
+                });
+            Servlet._db = admin.firestore();
+        }
+    }
+
     async getUser() {
         if (this._user === undefined) {
             const sessionCookie = this.req.cookies.session || '';
