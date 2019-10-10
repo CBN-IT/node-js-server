@@ -19,10 +19,10 @@ class Servlet{
     }
 
     initializeAppAndDatabase(){
-            if(admin.apps.length === 0){
-                admin.initializeApp({
-                    projectId: process.env.GOOGLE_CLOUD_PROJECT
-                });
+        if(admin.apps.length === 0){
+            admin.initializeApp({
+                projectId: process.env.GOOGLE_CLOUD_PROJECT
+            });
             Servlet._db = admin.firestore();
         }
     }
