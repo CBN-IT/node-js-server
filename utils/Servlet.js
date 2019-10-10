@@ -17,6 +17,7 @@ class Servlet{
         this.res = res;
         this.req = req;
         this.logger = this.req.log;
+        this._companyId = this.req.param._companyId;
     }
 
     get db(){
