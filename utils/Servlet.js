@@ -74,7 +74,7 @@ class Servlet{
             if(user == null){
                 this._account = null;
             } else if(this._isAdmin(user)){
-                this._account = Object.assign(user, {tipCont: 'SuperAdmin', _companyId: _companyId ? _companyId : this.req.param['_companyId'], accountEmail: user['email']})
+                this._account = Object.assign(user, {accountType: 'SuperAdmin', _companyId: _companyId ? _companyId : this.req.param['_companyId'], accountEmail: user['email']})
             } else {
                 let snapshot = this.db.collection('account').where('_deleted', '==', null).where('accountEmail', '==', user.email);
                 _companyId =_companyId ? _companyId : this.req.param['_companyId'];
@@ -98,8 +98,16 @@ class Servlet{
     }
 
     async checkLogin() {
-        if (this.requiredLogin && await this.getAccount() === null) {
-            throw new Error("Invalid user");
+        if (this.requiredLogin) {
+            let account = await this.getAccount();
+            if (account === null) {
+                throw new Error("Invalid user");
+            }
+            if (this.requiredUserType.length > 0 && account.accountType !== "SuperAdmin") {
+                if (!this.requiredUserType.includes(account.accountType)) {
+                    throw new Error("Invalid user");
+                }
+            }
         }
     }
     sendAsJson(str) {
