@@ -12,7 +12,7 @@ class Logout  extends Servlet {
             sameSite: "lax"
         };
         this.res.clearCookie('session',options);
-        this.res.redirect('/login');
+        this.res.redirect('/login/logout');
     }
 }
 

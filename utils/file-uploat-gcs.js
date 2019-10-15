@@ -22,7 +22,6 @@ function sendUploadToGCS(bucketName) {
         if (!req.files) {
             return next();
         }
-        console.log("merge?");
         const today = moment().format("YYYY/MM/DD");
         const prefix = today+"/"+Date.now()+"_";
         let promiseArr = [];

@@ -6,7 +6,7 @@ const fs = require("fs");
 
 class Login extends Servlet {
     static get url(){
-        return "/login";
+        return ["/login/:error/:extraError","/login/:error","/login"];
     }
 
     get requiredLogin(){
@@ -37,6 +37,8 @@ class Login extends Servlet {
         } else {
             data.csrfToken = cookie;
         }
+        data.error=this.req.param.error;
+        data.extraError=this.req.param.extraError;
         return data;
     }
 }

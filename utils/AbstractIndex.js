@@ -14,8 +14,22 @@ class AbstractIndex extends GetConfigs{
     }
 
     async execute(){
-        if(await this.getAccount() === null){
+        let user = await this.getUser();
+        if(user===null){
             this.res.redirect('/login');
+            return;
+        }
+        let account = await this.getAccount();
+        if(account === null){
+            this.res.redirect('/login/no-account/'+user.email);
+            return;
+        }
+        if(account.blockedAccess===true){
+            this.res.redirect('/login/account-ban/'+user.email);
+            return;
+        }
+        if(account.blockedAccessCompany===true){
+            this.res.redirect('/login/company-ban/'+account._companyName);
             return;
         }
         let index = fs.readFileSync(global.projectRoot + this.indexFile, 'utf8');
@@ -24,8 +38,7 @@ class AbstractIndex extends GetConfigs{
     }
 
     async _getData(){
-
-        let companies = [...await this.runQuery('', 'company', [['_deleted', '==', null]]), {_id: 'default', companyName: 'Default'}];
+        let companies = await this.getAllUserCompanies();
         let _companyId = await this._getDefaultCompany(companies);
         let forms = await this._getForms('server/configs', 'form', _companyId, true);
         let columns = await this._getForms('server/columns', 'columns', _companyId, true);
