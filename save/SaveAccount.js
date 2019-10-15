@@ -5,7 +5,12 @@ class SaveAccount extends SaveForm {
     static get url(){
         return '/SaveAccount';
     }
-
+    get requiredUserType(){
+        return ["Admin"];
+    }
+    get requiredLogin(){
+        return true;
+    }
     async execute(){
         let _companyId = this.req.param['_companyId'];
         this.req.param['_companyId'] = 'default';

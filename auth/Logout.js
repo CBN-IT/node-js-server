@@ -2,9 +2,11 @@ const Servlet = require('./../utils/Servlet');
 
 class Logout  extends Servlet {
     static get url() {
-        return '/logout';
+        return ['/logout',"/logout/:error"];
     }
-
+    get requiredLogin(){
+        return false;
+    }
     async execute() {
         const options = {
             httpOnly: true,
@@ -12,7 +14,11 @@ class Logout  extends Servlet {
             sameSite: "lax"
         };
         this.res.clearCookie('session',options);
-        this.res.redirect('/login/logout');
+        if (this.req.param.error) {
+            this.res.redirect('/login/' + this.req.param.error);
+        } else {
+            this.res.redirect('/login/logout');
+        }
     }
 }
 

@@ -30,6 +30,18 @@ const requestParam = (req, res, next) => {
             }
             return undefined;
         },
+        set(target, name,value) {
+            if (target.body[name] !== undefined) {
+                target.body[name] = value;
+            } else if (target.query[name] !== undefined) {
+                target.query[name]= value;
+            } else if (target.params[name] !== undefined) {
+                target.params[name]= value;
+            } else {
+                target.body[name] = value;
+            }
+            return true;
+        },
         has(target, name){
             return target.body[name] !== undefined || target.query[name] !== undefined || target.params[name] !== undefined;
         },

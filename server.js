@@ -29,10 +29,15 @@ function addMappings(app,arr){
                 await processor.checkLogin();
                 await processor.validate();
             } catch (error) {
-                req.log.w(error);
-                res.status(401);
-                res.send(error.message);
-                return;
+                if(req.xhr){
+                    req.log.w(error);
+                    res.status(401);
+                    res.send(error.message);
+                    return;
+                }else{
+                    res.redirect('/logout/unauthorized');
+                    return;
+                }
             }
 
             try {
@@ -40,7 +45,6 @@ function addMappings(app,arr){
                     processor.execute(),
                     timeout(55)
                 ]);
-                // req.log.i("SUCCESS");
             } catch (error){
                 req.log.w(error);
                 res.status(400);
