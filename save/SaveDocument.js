@@ -1,12 +1,13 @@
-const Servlet = require('./../utils/Servlet.js');
-class SaveDocument extends Servlet {
+const SaveForm = require('./../utils/SaveForm.js');
+
+class SaveDocument extends SaveForm {
 
     static get url(){
         return '/SaveDocument';
     }
 
     async execute(){
-        let document = await this.save(false);
+        let document = await this.save();
         this.sendAsJson(document)
     }
 
