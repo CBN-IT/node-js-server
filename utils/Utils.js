@@ -17,8 +17,48 @@ const getCircularReplacer = () => {
 };
 
 const requestParam = (req, res, next) => {
-    req.param = {};
-    Object.assign(req.param, req.body, req.query,req.params);
+    req.param = new Proxy(req, {
+        get(target, name) {
+            if (target.body[name] !== undefined) {
+                return target.body[name]
+            }
+            if (target.query[name] !== undefined) {
+                return target.query[name]
+            }
+            if (target.params[name] !== undefined) {
+                return target.params[name]
+            }
+            return undefined;
+        },
+        set(target, name,value) {
+            if (target.body[name] !== undefined) {
+                target.body[name] = value;
+            } else if (target.query[name] !== undefined) {
+                target.query[name]= value;
+            } else if (target.params[name] !== undefined) {
+                target.params[name]= value;
+            } else {
+                target.body[name] = value;
+            }
+            return true;
+        },
+        has(target, name){
+            return target.body[name] !== undefined || target.query[name] !== undefined || target.params[name] !== undefined;
+        },
+        getOwnPropertyDescriptor(target, name) {
+            return {
+                enumerable: true,
+                configurable: true,
+            };
+        },
+        ownKeys(target){
+            return [
+                ...Object.keys(target.params),
+                ...Object.keys(target.query),
+                ...Object.keys(target.body)
+            ]
+        },
+    });
     next();
 };
 

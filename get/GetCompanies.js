@@ -1,4 +1,4 @@
-const Servlet = require('node-js-server/utils/Servlet.js');
+const Servlet = require('../utils/Servlet.js');
 
 class GetCompanies extends Servlet {
 

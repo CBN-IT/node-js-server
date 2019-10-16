@@ -13,7 +13,9 @@ class Servlet{
     get db(){
         return Servlet._db;
     }
-
+    get requiredUserType(){
+        return [];
+    }
     get requiredLogin(){
         return true;
     }
@@ -39,13 +41,40 @@ class Servlet{
         return this._user;
     }
 
+    async getAllUserCompanies() {
+        let user = await this.getUser();
+        if (user == null) {
+            return [];
+        } else if (this._isAdmin(user)) {
+            return [
+                ...await this.runQuery('', 'company', [['_deleted', '==', null]]),
+                {
+                    _id: 'default',
+                    companyName: 'Default'
+                }
+            ];
+        } else {
+            let accounts = await this.runQuery("",'account',[
+                ['accountEmail', '==', user.email]
+            ]);
+            let ids = new Set();
+            for (let i = 0; i < accounts.length; i++) {
+                ids.add(accounts[i]._companyId);
+            }
+            ids = [...ids];
+            if(ids.length===0){
+                return [];
+            }
+            return this.getDocuments("", "company", [...ids])
+        }
+    }
     async getAccount(_companyId){
         if(this._account === undefined){
             let user = await this.getUser();
             if(user == null){
                 this._account = null;
             } else if(this._isAdmin(user)){
-                this._account = Object.assign(user, {tipCont: 'SuperAdmin', _companyId: _companyId ? _companyId : this.req.param['_companyId'], accountEmail: user['email']})
+                this._account = Object.assign(user, {accountType: 'SuperAdmin', _companyId: _companyId ? _companyId : this.req.param['_companyId'], accountEmail: user['email']})
             } else {
                 let snapshot = this.db.collection('account').where('_deleted', '==', null).where('accountEmail', '==', user.email);
                 _companyId =_companyId ? _companyId : this.req.param['_companyId'];
@@ -69,8 +98,16 @@ class Servlet{
     }
 
     async checkLogin() {
-        if (this.requiredLogin && await this.getAccount() === null) {
-            throw new Error("Invalid user");
+        if (this.requiredLogin) {
+            let account = await this.getAccount();
+            if (account === null) {
+                throw new Error("Invalid user");
+            }
+            if (this.requiredUserType.length > 0 && account.accountType !== "SuperAdmin") {
+                if (!this.requiredUserType.includes(account.accountType)) {
+                    throw new Error("Invalid user");
+                }
+            }
         }
     }
     sendAsJson(str) {
@@ -137,18 +174,18 @@ class Servlet{
     }
 
     async getDocuments(_companyId, collection, _ids){
-        let docRefs = _ids.map(_id => this.db.collection(`company/${_companyId}/${collection}`).doc(_id));
+        let path = _companyId === '' || _companyId === 'default' ? collection : `company/${_companyId}/${collection}`;
+        let docRefs = _ids.map(_id => this.db.collection(path).doc(_id));
         let snapshot = await this.db.getAll(...docRefs);
         return snapshot.map(doc => {return {_id: doc.id, ...doc.data()}});
     }
 
     async runQuery(_companyId, collection, conditions){
-        let path = _companyId === '' || _companyId === 'default' ? 'company' : `company/${_companyId}/${collection}`;
+        let path = _companyId === '' || _companyId === 'default' ? collection : `company/${_companyId}/${collection}`;
         let query = this.db.collection(path).where('_deleted', '==', null);
         conditions.forEach(condition => query = query.where(condition[0], condition[1], condition[2]));
         return this.processDocuments(await query.get());
     }
 
 }
-Servlet._db = db;
 module.exports = Servlet;
