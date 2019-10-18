@@ -6,7 +6,7 @@ const fs = require("fs");
 
 class Login extends Servlet {
     static get url(){
-        return ["/login/:error/:extraError","/login/:error","/login"];
+        return ["/login/:error/:extraError","/login/:error","/login", "/admin/login/:error/:extraError","/admin/login/:error","/admin/login"];
     }
 
     get requiredLogin(){
