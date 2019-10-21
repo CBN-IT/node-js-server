@@ -137,8 +137,8 @@ class SaveForm extends Servlet {
 
     }
 
-    async setConfig(collection){
-        this.config = await this._getConfig(collection);
+    setConfig(config){
+        this.config = config;
     }
 
 }

@@ -41,7 +41,7 @@ class AbstractIndex extends GetConfigs{
         let companies = await this.getAllUserCompanies();
         let _companyId = await this._getDefaultCompany(companies);
         let forms = await this._getForms('server/configs', 'form', _companyId, true);
-        let columns = await this._getForms('server/columns', 'columns', _companyId, true);
+        let columns = await this._getForms('server/columns', 'column', _companyId, true);
         let reports = await this._getReports('report', _companyId, true);
 
 

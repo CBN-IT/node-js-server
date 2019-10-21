@@ -6,7 +6,7 @@ const fs = require("fs");
 
 class Login extends Servlet {
     static get url(){
-        return ["/login/:error/:extraError","/login/:error","/login"];
+        return ["/login/:error/:extraError","/login/:error","/login", "/admin/login/:error/:extraError","/admin/login/:error","/admin/login"];
     }
 
     get requiredLogin(){
@@ -31,7 +31,7 @@ class Login extends Servlet {
             this.res.cookie('csrfToken', data.csrfToken, {
                 maxAge: 10 * 60 * 1000,
                 httpOnly: true,
-                secure: process.env.NODE_ENV !== 'development',
+                secure: process.env.NODE_ENV !== 'development',s
                 sameSite: "lax"
             });
         } else {
