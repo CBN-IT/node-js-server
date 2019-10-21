@@ -46,19 +46,16 @@ class Servlet{
         if (user == null) {
             return [];
         } else if (this._isAdmin(user)) {
-            return [
-                ...await this.runQuery('', 'company', [['_deleted', '==', null]]),
-                {
-                    _id: 'default',
-                    companyName: 'Default'
-                }
-            ];
+            return await this._getAllUserCompaniesAdmin();
         } else {
             let accounts = await this.runQuery("",'account',[
                 ['accountEmail', '==', user.email]
             ]);
             let ids = new Set();
             for (let i = 0; i < accounts.length; i++) {
+                if(accounts[i].accountType==="SuperAdmin"){
+                    return await this._getAllUserCompaniesAdmin();
+                }
                 ids.add(accounts[i]._companyId);
             }
             ids = [...ids];
@@ -68,22 +65,43 @@ class Servlet{
             return this.getDocuments("", "company", [...ids])
         }
     }
+    async _getAllUserCompaniesAdmin(){
+        return [
+            ...await this.runQuery('', 'company', [['_deleted', '==', null]]),
+            {
+                _id: 'default',
+                companyName: 'Default'
+            }
+        ];
+    }
+    _getSuperAdminCont(user,_companyId){
+        return Object.assign(user, {accountType: 'SuperAdmin', _companyId, accountEmail: user['email']});
+    }
     async getAccount(_companyId){
         if(this._account === undefined){
+            _companyId =_companyId ? _companyId : this.req.param['_companyId'];
             let user = await this.getUser();
             if(user == null){
                 this._account = null;
             } else if(this._isAdmin(user)){
-                this._account = Object.assign(user, {accountType: 'SuperAdmin', _companyId: _companyId ? _companyId : this.req.param['_companyId'], accountEmail: user['email']})
+                this._account = this._getSuperAdminCont(user, _companyId);
             } else {
-                let snapshot = this.db.collection('account').where('_deleted', '==', null).where('accountEmail', '==', user.email);
-                _companyId =_companyId ? _companyId : this.req.param['_companyId'];
-                if(_companyId ){
-                    snapshot = snapshot.where('_companyId', '==', _companyId ? _companyId : this.req.param['_companyId']);
-                }
-                snapshot = await snapshot.get();
+                let snapshot = await this.db.collection('account')
+                    .where('_deleted', '==', null)
+                    .where('accountEmail', '==', user.email)
+                    .get();
                 let accounts = this.processDocuments(snapshot, 'account');
-                this._account = accounts.length > 0 ? accounts[0] : null;
+                if (_companyId) {
+                    for (let i = 0; i < accounts.length; i++) {
+                        if (accounts[i].accountType === "SuperAdmin") {
+                            return this._account = this._getSuperAdminCont(user, _companyId);
+                        } else if (accounts[i]._companyId === _companyId) {
+                            return this._account = accounts[i];
+                        }
+                    }
+                } else {
+                    return this._account = accounts.length > 0 ? accounts[0] : null;
+                }
             }
         }
         return this._account;
