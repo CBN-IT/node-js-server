@@ -170,7 +170,7 @@ class Servlet{
         if(doc.exists){
             return {_id: doc.id, ...doc.data()};
         }
-        return {};
+        return null;
     }
 
     async getDocuments(_companyId, collection, _ids){

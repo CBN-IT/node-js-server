@@ -31,7 +31,7 @@ class Login extends Servlet {
             this.res.cookie('csrfToken', data.csrfToken, {
                 maxAge: 10 * 60 * 1000,
                 httpOnly: true,
-                secure: process.env.NODE_ENV !== 'development',
+                secure: process.env.NODE_ENV !== 'development',s
                 sameSite: "lax"
             });
         } else {
