@@ -23,23 +23,24 @@ class Upload extends Servlet {
             defval:""
         });
         let promiseArr = [];
-        this.renameHeaders(rows);
+        //await this.renameHeaders(rows);
+        let out =this._processGroupByHeaders(rows);
         for(let i=0;i<rows.length;i++){
             this.logger.d(rows[i]);
             promiseArr.push(createHttpTaskWithToken({
-                project:'xpc-enel-vanzari',
-                location:"europe-west1",
+                project:process.env.GOOGLE_CLOUD_PROJECT,
+                location:process.env.GAE_LOCATION,
                 payload:JSON.stringify({
                     ...rows[i],
                     _companyId:this.req.param._companyId,
-                    collection:this.req.param.collection,
-                    hashReport:"test"
+                    collection:this.req.param.collection
                 }),
-                url:this.req.protocol + "://" + this.req.get('host')+"/SaveClient"
+                url:this.req.protocol + "://" + this.req.get('host')+this.saveUrl
             }));
         }
         await Promise.all(promiseArr);
-        this.sendAsJson(rows);
+        //this.sendAsJson(rows);
+        this.sendAsJson(out);
     }
     async renameHeaders(rows){
         let headersToChange = {xlsHeader:"jsonHeader"};
@@ -54,33 +55,62 @@ class Upload extends Servlet {
             }
         }
     }
-    _groupByHeaders(rows){
-        let headers = this.groupByHeaders;
-        let start = -1;
-        let end = -1;
-        for (let i = 0; i < rows.length - 1; i++) {
-            let same = headers.length !== 0;
-            for (let j = 0; j < headers.length; j++) {
-                same = same && rows[i][headers[j]] === rows[i + 1][headers[j]]
-            }
-            if (same) {
-                if (start === -1) {
-                    start = i;
-                }
-                end = i + 1;
-            } else if (start !== -1) {
-                this._mergeRows(rows, start, end);
-            }
+    _processGroupByHeaders(rows){
+        let out =[{otherRows:rows}];
+        this._groupByHeaders(out);
+        delete out[0].otherRows;
+        return out;
+    }
+    _groupByHeaders(rows, h){
+        if (h === undefined) {
+            h = 0;
         }
 
+        let grH = this.groupByHeaders;
+        let kind = grH[h].name;
+        for (let i = 0; i < rows.length; i++) {
+            rows[i][kind] = [];
+            let out = rows[i][kind];
+            for (let j = 0; j < rows[i].otherRows.length; j++) {
+                let row = rows[i].otherRows[j];
+                let prevRow = rows[i].otherRows[j - 1];
+                if (j === 0 || this._getUniqueIdVal(row, grH[h]) !== this._getUniqueIdVal(prevRow, grH[h])) {
+                    let c = {};
+                    for (let [key, val] of Object.entries(row)) {
+                        if (key.startsWith(kind)) {
+                            c[key] = val;
+                        }
+                    }
+                    out.push(c);
+                    out[out.length - 1].otherRows = [];
+                }
+                out[out.length - 1].otherRows.push(row);
+            }
+            for (let n = 0; n < grH.length; n++) {
+                if (grH[n].parent === kind) {
+                    this._groupByHeaders(out, n);
+                }
+            }
+            for(let o=0;o<out.length;o++){
+                out[o].otherRows=undefined;
+            }
+        }
     }
-    _mergeRows(rows,start,end){
-        let mergedRow = rows
+    _getUniqueIdVal(row, grH){
+        let h=grH.uniqueId;
+        let kind=grH.name;
+        let r = [];
+        for(let i=0;i<h.length;i++){
+            r.push(row[kind+"."+h[i]]);
+        }
+        return r.join("|");
     }
     get groupByHeaders(){
         return []
     }
-
+    get saveUrl(){
+        return "/SaveClient"
+    }
 }
 module.exports = Upload;
 
