@@ -86,11 +86,7 @@ class Servlet{
             } else if(this._isAdmin(user)){
                 this._account = this._getSuperAdminCont(user, _companyId);
             } else {
-                let snapshot = await this.db.collection('account')
-                    .where('_deleted', '==', null)
-                    .where('accountEmail', '==', user.email)
-                    .get();
-                let accounts = this.processDocuments(snapshot, 'account');
+                let accounts = await this.runQuery('', account, [['accountEmail', '==', user.email]]);
                 if (_companyId) {
                     for (let i = 0; i < accounts.length; i++) {
                         if (accounts[i].accountType === "SuperAdmin") {
