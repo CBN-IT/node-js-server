@@ -78,7 +78,7 @@ class AbstractIndex extends GetConfigs{
     async _getDefaultCompany(companies){
         let account = await this.getAccount();
         let defaultOptions = await this.getDocument('', 'defaultOptions', account.accountEmail);
-        let defaultCompany = this.req.param['_companyId'] ? this.req.param['_companyId'] : defaultOptions.defaultCompany ? defaultOptions.defaultCompany : companies[0]._id;
+        let defaultCompany = this.req.param['_companyId'] ? this.req.param['_companyId'] : defaultOptions && defaultOptions.defaultCompany ? defaultOptions.defaultCompany : companies[0]._id;
         this.updateDocument('', 'defaultOptions', account.accountEmail, {defaultCompany}, true);
         return defaultCompany;
     }

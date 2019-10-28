@@ -86,11 +86,7 @@ class Servlet{
             } else if(this._isAdmin(user)){
                 this._account = this._getSuperAdminCont(user, _companyId);
             } else {
-                let snapshot = await this.db.collection('account')
-                    .where('_deleted', '==', null)
-                    .where('accountEmail', '==', user.email)
-                    .get();
-                let accounts = this.processDocuments(snapshot, 'account');
+                let accounts = await this.runQuery('', account, [['accountEmail', '==', user.email]]);
                 if (_companyId) {
                     for (let i = 0; i < accounts.length; i++) {
                         if (accounts[i].accountType === "SuperAdmin") {
@@ -141,11 +137,11 @@ class Servlet{
         this.sendAsJson({message: 'Execute method not implemented'})
     }
 
-    processDocuments(snapshot, path){
+    processDocuments(snapshot){
         let toReturn = [];
         snapshot.forEach(doc => {
             let processedData = this._processData(doc.data());
-            toReturn.push({_id: doc.id, path: path, ...processedData});
+            toReturn.push({_id: doc.id, _path: doc.ref.path, ...processedData});
         });
         return toReturn;
     }
@@ -165,18 +161,25 @@ class Servlet{
     async updateDocument(_companyId, collection, _id, newData, merge) {
         _id = !_id && newData.uniqueId ? newData.data[newData.uniqueId] : _id;
         newData = newData.uniqueId  ? newData.data : newData;
+        newData = this.cleanObject(newData);
+        let _path = _companyId !== 'default' && _companyId !== '' ? `company/${_companyId}/${collection}` : collection;
+        newData._pathCollection = _path;
+        let doc = _id ? await this.db.collection(_path).doc(_id).set(newData, {merge: !!merge}) : await this.db.collection(_path).add(newData);
+        return _id ? {_id: _id, _path: `${_path}/${_id}`, ...newData} : {_id: doc.id, _path: doc.path, ...newData};
+    }
+
+    async updateDocumentByPath(_path, newData, merge){
+        let doc = await this.db.doc(_path).set(newData, {merge: !!merge});
+        return {_path, ...newData};
+    }
+
+    cleanObject(newData){
         Object.keys(newData).forEach(key => {
             if(newData[key] === undefined){
                 delete newData[key];
             }
         });
-        let doc;
-        if (_id !== undefined && _id !== '') {
-            doc = await this.db.collection(_companyId !== 'default' && _companyId !== '' ? `company/${_companyId}/${collection}` : collection).doc(_id).set(newData, {merge: !!merge});
-        } else {
-            doc = await this.db.collection(_companyId !== 'default' && _companyId !== '' ? `company/${_companyId}/${collection}` : collection).add(newData);
-        }
-        return {_id: _id ? _id : doc.id, ...newData};
+        return newData;
     }
 
     deleteDocument(_companyId, collection, _id) {
@@ -184,25 +187,38 @@ class Servlet{
     }
 
     async getDocument(_companyId, collection, _id){
-        let doc = await this.db.collection(_companyId !== 'default' && _companyId !== '' ? `company/${_companyId}/${collection}` : collection).doc(_id).get();
+        let _pathCollection = _companyId !== 'default' && _companyId !== '' ? `company/${_companyId}/${collection}` : collection;
+        return this.getDocumentByPath(`${_pathCollection}/${_id}`)
+    }
+
+    async getDocumentByPath(_path){
+        let doc = await this.db.doc(_path).get();
         if(doc.exists){
-            return {_id: doc.id, ...doc.data()};
+            return {_id: doc.id, ...doc.data(), _path: _path};
         }
         return null;
     }
 
     async getDocuments(_companyId, collection, _ids){
-        let path = _companyId === '' || _companyId === 'default' ? collection : `company/${_companyId}/${collection}`;
-        let docRefs = _ids.map(_id => this.db.collection(path).doc(_id));
-        let snapshot = await this.db.getAll(...docRefs);
-        return snapshot.map(doc => {return {_id: doc.id, ...doc.data()}});
+        let _pathCollection = _companyId === '' || _companyId === 'default' ? collection : `company/${_companyId}/${collection}`;
+        let _paths = _ids.map(_id => `${_pathCollection}/${_id}`)
+        return this.getDocumentsByPath(_paths);
     }
 
-    async runQuery(_companyId, collection, conditions){
-        let path = _companyId === '' || _companyId === 'default' ? collection : `company/${_companyId}/${collection}`;
-        let query = this.db.collection(path).where('_deleted', '==', null);
+    async getDocumentsByPath(_paths){
+        if(!_paths || _paths.length === 0){
+            return [];
+        }
+        let docRefs = _paths.map(_path => this.db.doc(_path));
+        let snapshot = await this.db.getAll(...docRefs);
+        return snapshot.map(doc => {return {_id: doc.id, _path: doc.ref.path, ...doc.data()}});
+    }
+
+    async runQuery(_companyId, collection, conditions = []){
+        let _pathCollection = _companyId === '' || _companyId === 'default' ? collection : `company/${_companyId}/${collection}`;
+        let query = this.db.collection(_pathCollection).where('_deleted', '==', null);
         conditions.forEach(condition => query = query.where(condition[0], condition[1], condition[2]));
-        return this.processDocuments(await query.get());
+        return this.processDocuments(await query.get(), _pathCollection);
     }
 
 }
