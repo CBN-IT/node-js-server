@@ -25,13 +25,13 @@ class Upload extends Servlet {
         let promiseArr = [];
         //await this.renameHeaders(rows);
         let out =this._processGroupByHeaders(rows);
-        for(let i=0;i<rows.length;i++){
-            this.logger.d(rows[i]);
+        for(let i=0;i<out.length;i++){
+            this.logger.d(out[i]);
             promiseArr.push(createHttpTaskWithToken({
                 project:process.env.GOOGLE_CLOUD_PROJECT,
                 location:process.env.GAE_LOCATION,
                 payload:JSON.stringify({
-                    ...rows[i],
+                    ...out[i],
                     _companyId:this.req.param._companyId,
                     collection:this.req.param.collection
                 }),
