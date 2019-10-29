@@ -304,4 +304,4 @@ const _stringify = function(data, indent) {
 
 };
 
-module.exports = {timeout, getCircularReplacer, requestParam, _stringify};
+module.exports = {timeout, getCircularReplacer, requestParam, _stringify, redirectToHttps};
