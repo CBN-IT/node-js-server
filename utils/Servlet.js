@@ -86,7 +86,7 @@ class Servlet{
             } else if(this._isAdmin(user)){
                 this._account = this._getSuperAdminCont(user, _companyId);
             } else {
-                let accounts = await this.runQuery('', account, [['accountEmail', '==', user.email]]);
+                let accounts = await this.runQuery('', 'account', [['accountEmail', '==', user.email]]);
                 if (_companyId) {
                     for (let i = 0; i < accounts.length; i++) {
                         if (accounts[i].accountType === "SuperAdmin") {
