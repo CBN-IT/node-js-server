@@ -18,7 +18,7 @@ class SaveCompany extends SaveForm {
 
     async updateAccounts(oldCompany, newCompany){
         let promises = [];
-        if(oldCompany.blockedAccessCompany !== newCompany.blockedAccessCompany){
+        if(oldCompany && oldCompany.blockedAccessCompany !== newCompany.blockedAccessCompany){
             let accounts = await this.runQuery('', 'account', [['_companyId', '==', this._companyId]]);
             promises = accounts.map(account => this.updateDocument('', 'account', account._id, {blockedAccessCompany: newCompany.blockedAccessCompany}, true));
         }
