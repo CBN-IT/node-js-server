@@ -1,7 +1,7 @@
 const express = require('express');
 const path = require("path");
 const bodyParser = require("body-parser");
-const {requestParam, timeout} = require('./utils/Utils');
+const {requestParam, timeout, redirectToHttps} = require('./utils/Utils');
 const {logginMiddleware} = require('logging-js');
 
 
@@ -56,6 +56,7 @@ function addMappings(app,arr){
 
 function startApp(){
     const app = express();
+    app.use(redirectToHttps());
     app.use(cookieParser());
     app.use(logginMiddleware());
     app.use(bodyParser.json());
