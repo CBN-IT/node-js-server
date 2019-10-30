@@ -16,7 +16,6 @@ const getCircularReplacer = () => {
     };
 };
 const redirectToHttps = (req, res, next) => {
-    console.log(req.protocol);
     if (req.protocol === 'http' || req.headers.host.indexOf('localhost') > -1) {
         // request was via https, so do no special handling
         next();
