@@ -24,7 +24,36 @@ const redirectToHttps = (req, res, next) => {
         res.redirect('https://' + req.headers.host + req.url);
     }
 };
+function unflat(obj){
+    let entry = Object.entries(obj);
+    for(let [key,value] of entry){
+        if(key.includes(".")){
+            let keys = key.split(/[.]+/g);
+            let o = obj;
+            for (let i = 1; i < keys.length; i++) {
+                if (keys[i].match(/[0-9]+/g)) {
+                    if (o[keys[i-1]] === undefined) {
+                        o[keys[i-1]] = [];
+                    }
+                    o = o[keys[i-1]];
+                }else{
+                    if (o[keys[i-1]] === undefined) {
+                        o[keys[i-1]] = {};
+                    }
+                    o = o[keys[i-1]];
+                }
+            }
+            o[keys[keys.length-1]] = value;
+        }
+    }
+    return obj;
+}
+
 const requestParam = (req, res, next) => {
+    unflat(req.body);
+    unflat(req.query);
+    unflat(req.params);
+
     req.param = new Proxy(req, {
         get(target, name) {
             if (target.body[name] !== undefined) {
