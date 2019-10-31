@@ -32,7 +32,7 @@ class SaveForm extends Servlet {
                 this._processAdress(newData, field);
                 return;
             }
-            let value = this.req.param[field.name];
+            let value = this._getValue(field.multiple, this.req.param[field.name]);
             if(value !== undefined){
                 switch (field['dbType']){
                     case 'string':
@@ -56,7 +56,7 @@ class SaveForm extends Servlet {
                         break;
                     case 'file':
                         newData[field.name] = value;
-                        newData[field.name+"_urls"] = this.req.param[field.name+"_urls"] instanceof Array ? this.req.param[field.name+"_urls"] : [this.req.param[field.name+"_urls"]];
+                        newData[field.name+"_urls"] = this._getValue(field.multiple, this.req.param[field.name+"_urls"]);
                         break;
                 }
             }
@@ -69,6 +69,21 @@ class SaveForm extends Servlet {
         }
         // this.servletInstance.logger.i(config);
         return newData;
+    }
+
+    _getValue(multiple, value){
+        if(multiple){
+            if(!(value instanceof Array)){
+                if(value === ''){
+                    return [];
+                } else if(value){
+                    return [value];
+                } else{
+                    return [];
+                }
+            }
+        }
+        return value;
     }
 
     _processAdress(newData, field){
