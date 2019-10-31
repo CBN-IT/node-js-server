@@ -60,7 +60,7 @@ function startApp(){
     app.use(cookieParser());
     app.use(logginMiddleware());
     app.use(bodyParser.json());
-    app.use(bodyParser.urlencoded({extended: false}));
+    app.use(bodyParser.urlencoded({extended: false, limit:"5mb"}));
 
     app.use(multer.any());
     app.use(requestParam);
