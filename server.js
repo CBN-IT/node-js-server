@@ -63,8 +63,9 @@ function startApp(){
     app.use(bodyParser.urlencoded({extended: false}));
 
     app.use(multer.any());
-    app.use(sendUploadToGCS(`${process.env.GOOGLE_CLOUD_PROJECT}.appspot.com`));
     app.use(requestParam);
+    app.use(sendUploadToGCS(`${process.env.GOOGLE_CLOUD_PROJECT}.appspot.com`));
+
     app.listen(PORT, () => {
         console.log(`Server listening on port ${PORT}...`);
     });

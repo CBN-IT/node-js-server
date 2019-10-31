@@ -56,7 +56,7 @@ class SaveForm extends Servlet {
                         break;
                     case 'file':
                         newData[field.name] = value;
-                        newData[field.name+"_urls"] = this.req.param[field.name+"_urls"];
+                        newData[field.name+"_urls"] = this.req.param[field.name+"_urls"] instanceof Array ? this.req.param[field.name+"_urls"] : [this.req.param[field.name+"_urls"]];
                         break;
                 }
             }
