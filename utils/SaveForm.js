@@ -78,8 +78,6 @@ class SaveForm extends Servlet {
                     return [];
                 } else if(value){
                     return [value];
-                } else{
-                    return [];
                 }
             }
         }
