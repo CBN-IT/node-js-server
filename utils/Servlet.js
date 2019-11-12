@@ -186,6 +186,10 @@ class Servlet{
         return this.updateDocument(_companyId, collection, _id, {_deleted: new Date()}, true);
     }
 
+    deleteDocumentByPath(_path) {
+        return this.updateDocumentByPath(_path, {_deleted: new Date()}, true);
+    }
+
     async getDocument(_companyId, collection, _id){
         let _pathCollection = _companyId !== 'default' && _companyId !== '' ? `company/${_companyId}/${collection}` : collection;
         return this.getDocumentByPath(`${_pathCollection}/${_id}`)
