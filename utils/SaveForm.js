@@ -4,15 +4,15 @@ const Servlet = require('./Servlet.js');
 
 class SaveForm extends Servlet {
 
-    async saveWithMerge(newData){
+    async saveWithMerge(newData) {
         return this._processSave(newData, true);
     }
 
-    async save(newData){
+    async save(newData) {
         return this._processSave(newData, false);
     }
 
-    async _processSave(newData, merge){
+    async _processSave(newData, merge) {
 
         let _id = this.req.param['_id'];
         newData = newData ? newData : await this.getUpdatedData();
@@ -20,21 +20,24 @@ class SaveForm extends Servlet {
         return await this.updateDocument(_companyId, this.req.param.collection, _id, newData, merge)
     }
 
-    async getUpdatedData(){
+    async getUpdatedData() {
         this.config = this.config ? this.config : await this._getConfig();
-        return this.config.uniqueId && this.config.uniqueId !== '' ? {data: this._getFormData(this.config), uniqueId : this.config.uniqueId} : this._getFormData(this.config);
+        return this.config.uniqueId && this.config.uniqueId !== '' ? {
+            data: this._getFormData(this.config),
+            uniqueId: this.config.uniqueId
+        } : this._getFormData(this.config);
     }
 
-    _getFormData(config){
+    _getFormData(config) {
         let newData = {_deleted: null};
         config.elements.forEach(field => {
-            if(field['dbType'] === 'address'){
+            if (field['dbType'] === 'address') {
                 this._processAdress(newData, field);
                 return;
             }
-            let value = this._getValue(field.multiple, this.req.param[field.name]);
-            if(value !== undefined){
-                switch (field['dbType']){
+            let value = this._getValue(field.multiple, this.req.param[field.name], field.type);
+            if (value !== undefined) {
+                switch (field['dbType']) {
                     case 'string':
                         newData[field.name] = value;
                         break;
@@ -42,12 +45,12 @@ class SaveForm extends Servlet {
                         newData[field.name] = value === 'true';
                         break;
                     case 'integer':
-                        if(!isNaN(parseInt(value))){
+                        if (!isNaN(parseInt(value))) {
                             newData[field.name] = parseInt(value);
                         }
                         break;
                     case 'double':
-                        if(!isNaN(parseFloat(value))){
+                        if (!isNaN(parseFloat(value))) {
                             newData[field.name] = parseFloat(value);
                         }
                         break;
@@ -56,36 +59,39 @@ class SaveForm extends Servlet {
                         break;
                     case 'file':
                         newData[field.name] = value;
-                        newData[field.name+"_urls"] = this._getValue(field.multiple, this.req.param[field.name+"_urls"]);
+                        newData[field.name + "_urls"] = this._getValue(field.multiple, this.req.param[field.name + "_urls"], field.type);
                         break;
                 }
             }
-            if(field.type === 'select' && field['saveLabel'] && this.req.param[`${field.name}_label`]){
+            if (field.type === 'select' && field['saveLabel'] && this.req.param[`${field.name}_label`]) {
                 newData[`${field.name}_label`] = this.req.param[`${field.name}_label`];
             }
         });
-        if(config.label){
+        if (config.label) {
             newData._label = config.label.map(property => newData[property]).join(" ");
         }
-        // this.servletInstance.logger.i(config);
         return newData;
     }
 
-    _getValue(multiple, value){
-        if(multiple){
-            if(!(value instanceof Array)){
-                if(value === ''){
+    _getValue(multiple, value, fieldType) {
+        if (multiple) {
+            if (!(value instanceof Array)) {
+                if (value === '') {
                     return [];
-                } else if(value){
+                } else if (value) {
                     return [value];
                 }
+            }
+        } else if (fieldType === 'file') {
+            if (value instanceof Array) {
+                return value[0];
             }
         }
         return value;
     }
 
-    _processAdress(newData, field){
-        if(this.req.param[`${field.name}.id`]){
+    _processAdress(newData, field) {
+        if (this.req.param[`${field.name}.id`]) {
             // newData[`${field.name}.nume_localitate`] = this.servletInstance.req.param[`${field.name}.nume_localitate`];
             // newData[`${field.name}.nume_superior`] = this.servletInstance.req.param[`${field.name}.nume_superior`];
             // newData[`${field.name}.nume_judet`] = this.servletInstance.req.param[`${field.name}.nume_judet`];
@@ -120,14 +126,14 @@ class SaveForm extends Servlet {
         }
     }
 
-    async _getConfig(collection){
+    async _getConfig(collection) {
         collection = collection ? collection : this.req.param['collection'];
         let _companyId = this.req.param['_companyId'];
         //get from namespace
-        if(_companyId !== 'default'){
+        if (_companyId !== 'default') {
             let snapshot = await this.db.collection(`company/${_companyId}/form`).where('collection', '==', collection).get();
             let config = this.processDocuments(snapshot)[0];
-            if(config){
+            if (config) {
                 return JSON.parse(config.code);
             }
         }
@@ -135,27 +141,26 @@ class SaveForm extends Servlet {
         //get from empty namespace
         let snapshotDefault = await this.db.collection('form').where('collection', '==', collection).get();
         let configDefault = this.processDocuments(snapshotDefault)[0];
-        if(configDefault){
+        if (configDefault) {
             return JSON.parse(configDefault.code);
         }
 
         //get from file
-        try{
-            let contents = fs.readFileSync(path.join(global.projectRoot, `/server/configs/${collection}.json` ), 'utf8');
+        try {
+            let contents = fs.readFileSync(path.join(global.projectRoot, `/server/configs/${collection}.json`), 'utf8');
             return JSON.parse(contents);
-        } catch(err){
+        } catch (err) {
             this.logger.w(`No config found for ${collection}`);
             return null;
         }
 
     }
 
-    setConfig(config){
+    setConfig(config) {
         this.config = config;
     }
 
 }
-
 
 
 module.exports = SaveForm;
