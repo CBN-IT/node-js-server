@@ -20,6 +20,14 @@ class Servlet{
         return true;
     }
 
+    get requiredCompanyIdParam(){
+        return false;
+    }
+
+    get requiredParams(){
+        return [];
+    }
+
     initializeAppAndDatabase(){
         if(admin.apps.length === 0){
             admin.initializeApp({
@@ -108,6 +116,19 @@ class Servlet{
     }
 
     async validate(){
+        if(this.requiredCompanyIdParam && !this._companyId){
+            throw new Error("Invalid company id");
+        } else {
+            let missingParams = [];
+            this.requiredParams.forEach(param => {
+                if(!this.req.param[param]){
+                    missingParams.push(param);
+                }
+            });
+            if(missingParams.length > 0){
+                throw new Error("Invalid params: " + missingParams.join());
+            }
+        }
         return true;
     }
 
@@ -130,6 +151,15 @@ class Servlet{
             this.res.send(str);
         } else {
             this.res.send(JSON.stringify(str, getCircularReplacer()));
+        }
+    }
+
+    sendError(str){
+        this.res.setHeader('Content-Type', 'application/json; charset=UTF-8');
+        if (typeof str === "string") {
+            this.res.status(400).send(str);
+        } else {
+            this.res.status(400).send(JSON.stringify(str, getCircularReplacer()));
         }
     }
 

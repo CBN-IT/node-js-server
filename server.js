@@ -31,8 +31,8 @@ function addMappings(app,arr){
             } catch (error) {
                 if(req.xhr){
                     req.log.w(error);
-                    res.status(401);
-                    res.send(error.message);
+                    res.status(400);
+                    res.send({error: error.message});
                     return;
                 }else{
                     res.redirect('/logout/unauthorized');
