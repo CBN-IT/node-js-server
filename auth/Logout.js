@@ -10,7 +10,7 @@ class Logout  extends Servlet {
     async execute() {
         const options = {
             httpOnly: true,
-            secure: process.env.NODE_ENV !== 'development',
+            secure: this.req.protocol==="https",
             sameSite: "lax"
         };
         this.res.clearCookie('session',options);
