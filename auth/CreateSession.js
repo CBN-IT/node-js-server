@@ -27,7 +27,7 @@ class CreateSession extends Servlet {
                 const options = {
                     maxAge: expiresIn,
                     httpOnly: true,
-                    secure: process.env.NODE_ENV !== 'development',
+                    secure: this.req.protocol==="https",
                     sameSite: "lax"
                 };
                 this.res.cookie('session', sessionCookie, options);
