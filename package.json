@@ -4,6 +4,7 @@
   "description": "Node JS Server",
   "main": "server.js",
   "dependencies": {
+    "@google-cloud/bigquery": "latest",
     "@google-cloud/datastore": "5.0.0",
     "@google-cloud/trace-agent": "4.2.3",
     "@webcomponents/webcomponentsjs": "2.4.0",

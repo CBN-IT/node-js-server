@@ -13,6 +13,9 @@ class Servlet{
     get db(){
         return Servlet._db;
     }
+    get bigQueryDb(){
+        return Servlet._bigquery;
+    }
     get requiredUserType(){
         return [];
     }
@@ -34,6 +37,7 @@ class Servlet{
                 projectId: process.env.GOOGLE_CLOUD_PROJECT
             });
             Servlet._db = admin.firestore();
+            Servlet._bigquery = new BigQuery({});
         }
     }
 
@@ -195,12 +199,40 @@ class Servlet{
         let _path = _companyId !== 'default' && _companyId !== '' ? `company/${_companyId}/${collection}` : collection;
         newData._pathCollection = _path;
         let doc = _id ? await this.db.collection(_path).doc(_id).set(newData, {merge: !!merge}) : await this.db.collection(_path).add(newData);
-        return _id ? {_id: _id, _path: `${_path}/${_id}`, ...newData} : {_id: doc.id, _path: doc.path, ...newData};
+        let savedData =  _id ? {_id: _id, _path: `${_path}/${_id}`, ...newData} : {_id: doc.id, _path: doc.path, ...newData};
+        this.saveHistory(_companyId, collection, savedData);
+        return savedData;
+    }
+
+    async saveHistory(_companyId, collection, newData){
+        let account = await this.getAccount();
+        let fields = Object.entries(newData).map(([key, value]) => { return {name: key, value: typeof value === "string" ? value : JSON.stringify(value)}});
+        let row = {
+            company: _companyId,
+            collection: collection,
+            id: newData._id,
+            date: new Date(),
+            account: account._id,
+            accountEmail: account.accountEmail,
+            field: fields
+        };
+        return await this.bigQueryDb.dataset("history")
+            .table("history")
+            .insert([row]);
     }
 
     async updateDocumentByPath(_path, newData, merge){
         let doc = await this.db.doc(_path).set(newData, {merge: !!merge});
-        return {_path, ...newData};
+        let savedData = {_path, ...newData};
+        this.saveHistoryByPath(_path, newData);
+        return savedData;
+    }
+
+    async saveHistoryByPath(_path, newData){
+        let splits = _path.split('/');
+        return splits.length === 2 ?
+            this.saveHistory('', splits[0], {...newData, _id: splits[1]}) :
+            this.saveHistory(splits[1], splits[2], {...newData, _id: splits[3]});
     }
 
     cleanObject(newData){
