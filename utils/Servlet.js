@@ -1,5 +1,6 @@
 const {getCircularReplacer} = require('./Utils');
 const admin = require('firebase-admin');
+const {BigQuery} = require('@google-cloud/bigquery');
 
 class Servlet{
     constructor(req, res){
