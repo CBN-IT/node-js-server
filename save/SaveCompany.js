@@ -12,7 +12,7 @@ class SaveCompany extends SaveForm {
         let oldCompany = this.getDocument('', 'company', this.req.param._id);
         let newCompany = await this.save();
         await this.updateAccounts(oldCompany, newCompany);
-        this.sendAsJson({message: 'Saved Company'});
+        this.sendAsJson(newCompany);
 
     }
 
