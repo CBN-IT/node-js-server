@@ -8,8 +8,7 @@ class GetAccounts extends Servlet {
     async execute(){
         let collection = this.req.param['collection'];
         let _companyId = this.req.param['_companyId'];
-        let snapshot = await this.db.collection(collection).where('_deleted', '==', null).where('_companyId', '==', _companyId).get();
-        let documents = this.processDocuments(snapshot);
+        let documents = await this.runQuery('', collection, [['_companyId', '==', _companyId]]);
         this.sendAsJson(documents)
     }
 }

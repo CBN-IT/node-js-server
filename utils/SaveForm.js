@@ -92,12 +92,6 @@ class SaveForm extends Servlet {
 
     _processAdress(newData, field) {
         if (this.req.param[`${field.name}.id`]) {
-            // newData[`${field.name}.nume_localitate`] = this.servletInstance.req.param[`${field.name}.nume_localitate`];
-            // newData[`${field.name}.nume_superior`] = this.servletInstance.req.param[`${field.name}.nume_superior`];
-            // newData[`${field.name}.nume_judet`] = this.servletInstance.req.param[`${field.name}.nume_judet`];
-            // newData[`${field.name}.id`] = this.servletInstance.req.param[`${field.name}.id`];
-            // newData[`${field.name}.ancestor`] = this.servletInstance.req.param[`${field.name}.ancestor`];
-            // newData[`${field.name}.label`] = this.servletInstance.req.param[`${field.name}_label`];
             newData[`${field.name}_label`] = this.req.param[`${field.name}_label`];
             newData[field.name] = {
                 nume_localitate: this.req.param[`${field.name}.nume_localitate`],
@@ -108,12 +102,6 @@ class SaveForm extends Servlet {
                 label: this.req.param[`${field.name}_label`]
             };
         } else {
-            // newData[`${field.name}.nume_localitate`] = '';
-            // newData[`${field.name}.nume_superior`] = '';
-            // newData[`${field.name}.nume_judet`] = '';
-            // newData[`${field.name}.id`] = '';
-            // newData[`${field.name}.ancestor`] = '';
-            // newData[`${field.name}.label`] = '';
             newData[`${field.name}_label`] = '';
             newData[field.name] = {
                 nume_localitate: '',
@@ -131,16 +119,14 @@ class SaveForm extends Servlet {
         let _companyId = this.req.param['_companyId'];
         //get from namespace
         if (_companyId !== 'default') {
-            let snapshot = await this.db.collection(`company/${_companyId}/form`).where('collection', '==', collection).get();
-            let config = this.processDocuments(snapshot)[0];
+            let [config] = await this.runQuery(_companyId, 'form', [['collection', '==', collection]]);
             if (config) {
                 return JSON.parse(config.code);
             }
         }
 
         //get from empty namespace
-        let snapshotDefault = await this.db.collection('form').where('collection', '==', collection).get();
-        let configDefault = this.processDocuments(snapshotDefault)[0];
+        let [configDefault] = await this.runQuery(_companyId, '', [['collection', '==', collection]]);
         if (configDefault) {
             return JSON.parse(configDefault.code);
         }

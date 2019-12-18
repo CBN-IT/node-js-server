@@ -17,15 +17,11 @@ class GetConfigs extends Servlet {
 
     async _getForms(folderName, collection, _companyId, justJSON){
         let formsFromFile = this._getConfigs(folderName);
-        let snapshotDefault = await this.db.collection(collection).where('_deleted', '==', null).get();
-        let formsDefault = this.processDocuments(snapshotDefault);
+        let formsDefault = await this.runQuery('', collection, []);
         let forms = [];
-
         if(_companyId !== 'default'){
-            let snapshot = await this.db.collection(`company/${_companyId}/${collection}`).where('_deleted', '==', null).get();
-            forms = this.processDocuments(snapshot);
+            forms = await this.runQuery(_companyId, collection, []);
         }
-
         return this._mergeForms(formsFromFile, formsDefault, forms, justJSON);
     }
 

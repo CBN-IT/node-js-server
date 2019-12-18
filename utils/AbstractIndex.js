@@ -63,12 +63,9 @@ class AbstractIndex extends GetConfigs{
     }
 
     async _getReports(collection, _companyId){
-        let snapshotDefault = await this.db.collection(collection).where('_deleted', '==', null).get();
-        let allReports = this.processDocuments(snapshotDefault, 'report');
-
+        let allReports = await this.runQuery('', collection, []);
         if(_companyId !== 'default'){
-            let snapshot = await this.db.collection(`company/${_companyId}/${collection}`).where('_deleted', '==', null).get();
-            let reports = this.processDocuments(snapshot, `company/${_companyId}/${collection}`);
+            let reports = await this.runQuery(_companyId, collection, []);
             allReports = [...allReports, ...reports];
         }
 
