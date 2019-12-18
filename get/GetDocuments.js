@@ -7,10 +7,7 @@ class GetDocuments extends Servlet {
 
     async execute(){
         let collection = this.req.param['collection'];
-        let _companyId = this.req.param['_companyId'];
-        let path = _companyId !== 'default' ? `company/${_companyId}/${collection}` : collection;
-        let snapshot = await this.db.collection(path).where('_deleted', '==', null).get();
-        let documents = this.processDocuments(snapshot, path);
+        let documents = await this.runQuery(this._companyId, collection);
         this.sendAsJson(documents)
     }
 }
