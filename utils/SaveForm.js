@@ -126,7 +126,7 @@ class SaveForm extends Servlet {
         }
 
         //get from empty namespace
-        let [configDefault] = await this.runQuery(_companyId, '', [['collection', '==', collection]]);
+        let [configDefault] = await this.runQuery('', 'form', [['collection', '==', collection]]);
         if (configDefault) {
             return JSON.parse(configDefault.code);
         }
