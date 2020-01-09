@@ -1,7 +1,7 @@
 const GetConfigs = require('../get/GetConfigs.js');
 const {_stringify} = require('./Utils.js');
 const fs = require("fs");
-
+const path = require("path");
 
 class AbstractIndex extends GetConfigs{
 
@@ -32,7 +32,7 @@ class AbstractIndex extends GetConfigs{
             this.res.redirect('/login/company-ban/'+account._companyName);
             return;
         }
-        let index = fs.readFileSync(global.projectRoot + this.indexFile, 'utf8');
+        let index = fs.readFileSync(path.join(global.projectRoot, "web", this.indexFile), 'utf8');
         let data = await this._getData();
         this.res.send(index.replace('"data_to_replace"', _stringify(data)));
     }

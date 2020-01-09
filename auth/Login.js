@@ -2,7 +2,7 @@ const Servlet = require('./../utils/Servlet');
 const uuidv4 = require('uuid/v4');
 const {_stringify} = require('./../utils/Utils');
 const fs = require("fs");
-
+const path = require("path");
 
 class Login extends Servlet {
     static get url(){
@@ -14,7 +14,7 @@ class Login extends Servlet {
     }
 
     async execute(){
-        let index = fs.readFileSync( global.projectRoot + this.indexFile, 'utf8');
+        let index = fs.readFileSync(path.join(global.projectRoot, "web", this.indexFile), 'utf8');
         let data = await this._getData();
         this.res.send(index.replace('"data_to_replace"', _stringify(data)));
     }

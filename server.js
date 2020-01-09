@@ -56,7 +56,7 @@ function addMappings(app,arr){
 
 function startApp(){
     const app = express();
-    app.use(redirectToHttps);
+    //app.use(redirectToHttps);
     app.use(cookieParser());
     app.use(logginMiddleware());
     app.use(bodyParser.json());
