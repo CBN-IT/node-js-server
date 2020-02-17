@@ -15,21 +15,21 @@ class AbstractIndex extends GetConfigs{
 
     async execute(){
         let user = await this.getUser();
-        if(user===null){
+        if (user === null) {
             this.res.redirect('/login');
             return;
         }
         let account = await this.getAccount();
-        if(account === null){
-            this.res.redirect('/login/no-account/'+user.email);
+        if (account === null || account === undefined) {
+            this.res.redirect('/login/no-account/' + user.email);
             return;
         }
-        if(account.blockedAccess===true){
-            this.res.redirect('/login/account-ban/'+user.email);
+        if (account.blockedAccess === true) {
+            this.res.redirect('/login/account-ban/' + user.email);
             return;
         }
-        if(account.blockedAccessCompany===true){
-            this.res.redirect('/login/company-ban/'+account._companyName);
+        if (account.blockedAccessCompany === true) {
+            this.res.redirect('/login/company-ban/' + account._companyName);
             return;
         }
         let index = fs.readFileSync(path.join(global.projectRoot, "web", this.indexFile), 'utf8');
