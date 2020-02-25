@@ -94,12 +94,12 @@ class SaveForm extends Servlet {
         if (this.req.param[`${field.name}.id`]) {
             newData[`${field.name}_label`] = this.req.param[`${field.name}_label`];
             newData[field.name] = {
-                nume_localitate: this.req.param[`${field.name}.nume_localitate`],
-                nume_superior: this.req.param[`${field.name}.nume_superior`],
-                nume_judet: this.req.param[`${field.name}.nume_judet`],
-                id: this.req.param[`${field.name}.id`],
-                ancestor: this.req.param[`${field.name}.ancestor`],
-                label: this.req.param[`${field.name}_label`]
+                nume_localitate: this.req.param[`${field.name}.nume_localitate`] || "",
+                nume_superior: this.req.param[`${field.name}.nume_superior`] || "",
+                nume_judet: this.req.param[`${field.name}.nume_judet`] || "",
+                id: this.req.param[`${field.name}.id`] || "",
+                ancestor: this.req.param[`${field.name}.ancestor`] || "",
+                label: this.req.param[`${field.name}_label`] || ""
             };
         } else {
             newData[`${field.name}_label`] = '';
