@@ -12,25 +12,27 @@ class AbstractIndex extends GetConfigs{
     get requiredLogin(){
         return false;
     }
-
+    _redirectWithContinue(urlPath){
+        let url = new URL(this.req.protocol + '://' + this.req.get('host') + urlPath);
+        url.searchParams.append("continue", this.req.url);
+        this.res.redirect(url);
+        return url.toString();
+    }
     async execute(){
         let user = await this.getUser();
+        console.log(this.req.url);
         if (user === null) {
-            this.res.redirect('/login');
-            return;
+            return this._redirectWithContinue('/login');
         }
         let account = await this.getAccount();
         if (account === null || account === undefined) {
-            this.res.redirect('/login/no-account/' + user.email);
-            return;
+            return this._redirectWithContinue('/login/no-account/' + user.email);
         }
         if (account.blockedAccess === true) {
-            this.res.redirect('/login/account-ban/' + user.email);
-            return;
+            return this._redirectWithContinue('/login/account-ban/' + user.email);
         }
         if (account.blockedAccessCompany === true) {
-            this.res.redirect('/login/company-ban/' + account._companyName);
-            return;
+            return this._redirectWithContinue('/login/company-ban/' + account._companyName);
         }
         let index = fs.readFileSync(path.join(global.projectRoot, "web", this.indexFile), 'utf8');
         let data = await this._getData();
