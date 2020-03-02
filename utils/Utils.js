@@ -16,7 +16,11 @@ const getCircularReplacer = () => {
     };
 };
 const redirectToHttps = (req, res, next) => {
-    if (req.protocol === 'http' || req.headers.host.indexOf('localhost') > -1) {
+    let url = new URL(req.protocol+"://"+req.headers.host);
+    if (req.protocol === 'http' ||
+        req.headers.host.indexOf('localhost') > -1 ||
+        /*appengine subdomain doesnt allow https on second level subdomain*/
+        url.hostname.split(".").length >= 4) {
         // request was via https, so do no special handling
         next();
     } else {
