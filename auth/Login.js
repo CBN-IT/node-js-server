@@ -1,5 +1,5 @@
 const Servlet = require('./../utils/Servlet');
-const uuidv4 = require('uuid/v4');
+const { v4: uuidv4 } = require('uuid');
 const {_stringify} = require('./../utils/Utils');
 const fs = require("fs");
 const path = require("path");
