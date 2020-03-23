@@ -206,8 +206,10 @@ class Servlet{
     }
 
     async saveHistory(_companyId, collection, newData){
-        let account = await this.getAccount();
-        let fields = Object.entries(newData).map(([key, value]) => { return {name: key, value: typeof value === "string" ? value : JSON.stringify(value)}});
+        let account = await this.getAccount() || {};
+        let fields = Object.entries(newData).map(([key, value]) => {
+            return {name: key, value: typeof value === "string" ? value : JSON.stringify(value)}
+        });
         let row = {
             company: _companyId,
             collection: collection,
