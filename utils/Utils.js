@@ -1,6 +1,8 @@
+const {TimeoutError} =require("./errors");
+
 const timeout = (nrSec) => {
     return new Promise(function (resolve, reject) {
-        setTimeout(reject, nrSec * 1000, new Error('TIMEOUT ' + nrSec + "s"));
+        setTimeout(reject, nrSec * 1000, new TimeoutError('TIMEOUT ' + nrSec + "s"));
     });
 };
 const getCircularReplacer = () => {

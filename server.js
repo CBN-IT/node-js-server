@@ -1,3 +1,5 @@
+const {TimeoutError,AuthorizationError,AuthenticationError,ValidationError,RequiredFieldError} =require("./utils/errors");
+
 const express = require('express');
 const path = require("path");
 const bodyParser = require("body-parser");
@@ -28,27 +30,42 @@ function addMappings(app,arr){
             try {
                 await processor.checkLogin();
                 await processor.validate();
-            } catch (error) {
-                if(req.xhr){
-                    req.log.w(error);
-                    res.status(400);
-                    res.send({error: error.message});
-                    return;
-                }else{
-                    res.redirect('/logout/unauthorized');
-                    return;
-                }
-            }
-
-            try {
                 await Promise.race([
                     processor.execute(),
                     timeout(55)
                 ]);
             } catch (error){
-                req.log.w(error);
-                res.status(400);
-                res.send(error.message);
+                if(error instanceof TimeoutError){
+                    req.log.w(error);
+                    res.status(408);
+                } else if (error instanceof AuthenticationError) {
+                    req.log.i(error);
+                    if (req.xhr) {
+                        res.status(401);
+                    } else {
+                        res.redirect('/login');
+                        return;
+                    }
+                } else if(error instanceof AuthorizationError){
+                    req.log.w(error);
+                    if (req.xhr) {
+                        res.status(401);
+                    } else {
+                        res.redirect('/logout/unauthorized');
+                        return;
+                    }
+                } else if(error instanceof ValidationError){
+                    req.log.w(error);
+                    res.status(400);
+                } else if(error instanceof RequiredFieldError){
+                    req.log.w(error);
+                    res.status(422);
+                } else {
+                    req.log.s(error);
+                    res.status(500);
+                }
+                res.setHeader('Content-Type', 'application/json; charset=UTF-8');
+                res.send(JSON.stringify(error));
             }
         });
     });

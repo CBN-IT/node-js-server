@@ -1,3 +1,4 @@
+const {AuthenticationError, AuthorizationError, RequiredFieldError, ValidationError} = require("./errors");
 const {getCircularReplacer} = require('./Utils');
 const admin = require('firebase-admin');
 const {BigQuery} = require('@google-cloud/bigquery');
@@ -9,6 +10,7 @@ class Servlet{
         this.logger = this.req.log;
         this._companyId = this.req.param._companyId;
         this.initializeAppAndDatabase();
+        this.logger.tag("companyId",this._companyId);
     }
 
     get db(){
@@ -44,13 +46,14 @@ class Servlet{
 
     async getUser() {
         if (this._user === undefined) {
-            const sessionCookie = this.req.cookies.session || '';
+            const sessionCookie = (this.req.cookies && this.req.cookies.session) || '';
             if (sessionCookie === "") {
                 this._user = null;
             } else {
                 this._user = await admin.auth().verifySessionCookie(sessionCookie);
             }
         }
+        this.logger.tag("user", this._user);
         return this._user;
     }
 
@@ -122,7 +125,7 @@ class Servlet{
 
     async validate(){
         if(this.requiredCompanyIdParam && !this._companyId){
-            throw new Error("Invalid company id");
+            throw new RequiredFieldError("Invalid company id");
         } else {
             let missingParams = [];
             this.requiredParams.forEach(param => {
@@ -131,7 +134,7 @@ class Servlet{
                 }
             });
             if(missingParams.length > 0){
-                throw new Error("Invalid params: " + missingParams.join());
+                throw new RequiredFieldError("Invalid params: " + missingParams.join());
             }
         }
         return true;
@@ -141,11 +144,11 @@ class Servlet{
         if (this.requiredLogin) {
             let account = await this.getAccount();
             if (account === null) {
-                throw new Error("Invalid user");
+                throw new AuthenticationError("No user");
             }
             if (this.requiredUserType.length > 0 && account.accountType !== "SuperAdmin") {
                 if (!this.requiredUserType.includes(account.accountType)) {
-                    throw new Error("Invalid user");
+                    throw new AuthorizationError("Invalid user type");
                 }
             }
         }
@@ -159,12 +162,19 @@ class Servlet{
         }
     }
 
-    sendError(str){
-        this.res.setHeader('Content-Type', 'application/json; charset=UTF-8');
+    sendError(str) {
         if (typeof str === "string") {
-            this.res.status(400).send(str);
+            throw new ValidationError(str);
         } else {
-            this.res.status(400).send(JSON.stringify(str, getCircularReplacer()));
+            if (str.message) {
+                let error = new ValidationError(str.message);
+                for (let [key, val] of Object.entries(str)) {
+                    error[key] = val;
+                }
+            } else {
+                throw new ValidationError(JSON.stringify(str, getCircularReplacer()));
+            }
+
         }
     }
 
