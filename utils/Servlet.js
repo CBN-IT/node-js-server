@@ -53,7 +53,7 @@ class Servlet{
                 this._user = await admin.auth().verifySessionCookie(sessionCookie);
             }
         }
-        this.logger.tag("user", this._user);
+        this.logger.tag("user", this._user ? this._user.email : null);
         return this._user;
     }
 
