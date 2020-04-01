@@ -1,4 +1,4 @@
-const {TimeoutError,AuthorizationError,AuthenticationError,ValidationError,RequiredFieldError} =require("./utils/errors");
+const {TimeoutError,AuthorizationError,AuthenticationError,ValidationError,RequiredFieldError} =require("./utils/errors.js");
 
 const express = require('express');
 const path = require("path");
@@ -73,6 +73,10 @@ function addMappings(app,arr){
 
 function startApp(){
     const app = express();
+    app.use('/robots.txt', function (req, res) {
+        res.type('text/plain');
+        res.send("User-agent: *\nDisallow: /");
+    });
     app.use(redirectToHttps);
     app.use(cookieParser());
     app.use(logginMiddleware());
