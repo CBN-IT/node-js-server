@@ -13,8 +13,12 @@ class SaveHelp extends SaveForm {
     }
 
     async execute(){
-        let newData = {date: moment().format("YYYY-MM-DD"), ...await this.getUpdatedData()};
-        let response = await this.updateDocument(this.req.param._companyId, this.req.param.collection, this.req.param._id, newData, false);
+        let newData = {
+            ...await this.getUpdatedData(),
+            date: moment().format("YYYY-MM-DD"),
+            companyId: this.req.param._companyId
+        };
+        let response = await this.updateDocument('default', "help", this.req.param._id, newData, false);
         await this.sendHelpMail(newData);
         this.sendAsJson(response);
     }
@@ -23,10 +27,15 @@ class SaveHelp extends SaveForm {
         let html = `
             <div>Proiect: ${process.env.GOOGLE_CLOUD_PROJECT}</div>
             <div>Firma: ${this.req.param._companyId}</div>
-            <div>User: ${(await this.getAccount())['emailCont']}</div>
+            <div>User: ${(await this.getAccount())['accountEmail']}</div>
             <div>Mesaj: ${document.message}</div>
         `;
-        return SendGrid.sendHtmlMail(['octavianvoloaca@gmail.com', 'bogdan.noureescu@cbn-it.ro'], 'office@cbn-it.ro', `Solicitare ajutor - ${this.req.param._companyId}`, html);
+        return SendGrid.sendHtmlMail(
+            ['octavianvoloaca@gmail.com', 'bogdan.nourescu@cbn-it.ro'],
+            'office@cbn-it.ro',
+            `Solicitare ajutor - ${this.req.param._companyId}`,
+            html
+        );
     }
 
 }
