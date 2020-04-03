@@ -3,38 +3,85 @@ const {getCircularReplacer} = require('./Utils');
 const admin = require('firebase-admin');
 const {BigQuery} = require('@google-cloud/bigquery');
 
+/**
+ * This is the base class for all the API calls <br />
+ * You need to override it and override <br/>
+ * {@link Servlet#execute} <br/>
+ * {@link Servlet.url} <br/>
+ */
 class Servlet{
     constructor(req, res){
         this.res = res;
         this.req = req;
         this.logger = this.req.log;
         this._companyId = this.req.param._companyId;
-        this.initializeAppAndDatabase();
+        this._initializeAppAndDatabase();
         this.logger.tag("companyId",this._companyId);
     }
 
+    /**
+     *
+     * @type {string|Array}
+     */
+    static get url() {
+        return null;
+    }
+
+    /**
+     *
+     * @type {admin.firestore.Firestore}
+     */
     get db(){
         return Servlet._db;
     }
+
+    /**
+     *
+     * @type {BigQuery}
+     */
     get bigQueryDb(){
         return Servlet._bigquery;
     }
+
+    /**
+     *
+     * @type {Array}
+     */
     get requiredUserType(){
         return [];
     }
+
+    /**
+     *
+     * @type {boolean}
+     */
     get requiredLogin(){
         return true;
     }
 
+    /**
+     * @deprecated
+     * Checks if the _companyId param is needed for this api call <br/>
+     * Extend it and return true if its needed
+     * @type {boolean}
+     */
     get requiredCompanyIdParam(){
         return false;
     }
 
+    /**
+     * Extend it and return an array of params that are mandatory to be able to process the request
+     * @type {Array<Array<String>>}
+     */
     get requiredParams(){
         return [];
     }
 
-    initializeAppAndDatabase(){
+    /**
+     *
+     * @private
+     */
+    _initializeAppAndDatabase(){
         if(admin.apps.length === 0){
             admin.initializeApp({
                 projectId: process.env.GOOGLE_CLOUD_PROJECT
@@ -44,6 +91,10 @@ class Servlet{
         }
     }
 
+    /**
+     *
+     * @returns {Promise<null|admin.auth.DecodedIdToken>}
+     */
     async getUser() {
         if (this._user === undefined) {
             const sessionCookie = (this.req.cookies && this.req.cookies.session) || '';
@@ -57,6 +108,10 @@ class Servlet{
         return this._user;
     }
 
+    /**
+     *
+     * @returns {Promise<Array<Company>>}
+     */
     async getAllUserCompanies() {
         let user = await this.getUser();
         if (user == null) {
@@ -81,6 +136,12 @@ class Servlet{
             return this.getDocuments("", "company", [...ids])
         }
     }
+
+    /**
+     *
+     * @returns {Promise<Array<Company>>}
+     * @private
+     */
     async _getAllUserCompaniesAdmin(){
         return [
             ...await this.runQuery('', 'company', [['_deleted', '==', null]]),
@@ -90,9 +151,23 @@ class Servlet{
             }
         ];
     }
+
+    /**
+     *
+     * @param user
+     * @param _companyId
+     * @returns {Object}
+     * @private
+     */
     _getSuperAdminCont(user,_companyId){
         return Object.assign(user, {accountType: 'SuperAdmin', _companyId, accountEmail: user['email']});
     }
+
+    /**
+     *
+     * @param _companyId
+     * @returns {Promise<null|Object>}
+     */
     async getAccount(_companyId){
         if(this._account === undefined){
             _companyId =_companyId ? _companyId : this.req.param['_companyId'];
@@ -119,27 +194,38 @@ class Servlet{
         return this._account;
     }
 
+    /**
+     *
+     * @param user
+     * @returns {Boolean}
+     * @private
+     */
     _isAdmin(user){
         return user !== null && (user.email === 'octavianvoloaca@gmail.com' || user.email === 'bogdan.nourescu@cbn-it.ro');
     }
 
-    async validate(){
-        if(this.requiredCompanyIdParam && !this._companyId){
-            throw new RequiredFieldError("Invalid company id");
-        } else {
-            let missingParams = [];
-            this.requiredParams.forEach(param => {
-                if(!this.req.param[param]){
-                    missingParams.push(param);
-                }
-            });
-            if(missingParams.length > 0){
-                throw new RequiredFieldError("Invalid params: " + missingParams.join());
+    /**
+     *
+     * @returns {Promise<boolean>}
+     */
+    async validate() {
+        if(this.requiredParams.length===0){
+            return true;
+        }
+        let missingParams = this.requiredParams.map(arr => arr.filter(param => this.req.param[param]==null));
+        for(let paramsNotFound of missingParams){
+            if(paramsNotFound.length===0){
+                return true;
             }
         }
-        return true;
+        throw new RequiredFieldError("Invalid params: " + missingParams.join(" OR\n"));
     }
 
+    /**
+     *
+     * @returns {Promise<void>}
+     * @throws {AuthenticationError|AuthorizationError}
+     */
     async checkLogin() {
         if (this.requiredLogin) {
             let account = await this.getAccount();
@@ -153,6 +239,11 @@ class Servlet{
             }
         }
     }
+
+    /**
+     *
+     * @param {Array|Object|String} str
+     */
     sendAsJson(str) {
         this.res.setHeader('Content-Type', 'application/json; charset=UTF-8');
         if (typeof str === "string") {
@@ -162,6 +253,10 @@ class Servlet{
         }
     }
 
+    /**
+     *
+     * @param {String|Object}str
+     */
     sendError(str) {
         if (typeof str === "string") {
             throw new ValidationError(str);
@@ -178,10 +273,19 @@ class Servlet{
         }
     }
 
+    /**
+     * Execute the code and call sendAsJson
+     * @returns {Promise<void>}
+     */
     async execute(){
         this.sendAsJson({message: 'Execute method not implemented'})
     }
 
+    /**
+     *
+     * @param snapshot
+     * @returns {Array<Object>}
+     */
     processDocuments(snapshot){
         let toReturn = [];
         snapshot.forEach(doc => {
@@ -191,6 +295,12 @@ class Servlet{
         return toReturn;
     }
 
+    /**
+     * 
+     * @param data
+     * @returns {*}
+     * @private
+     */
     _processData(data){
         Object.entries(data).forEach(([key, value]) => {
             let keys = key.split('.');
@@ -203,6 +313,15 @@ class Servlet{
         return data;
     }
 
+    /**
+     * 
+     * @param _companyId
+     * @param collection
+     * @param _id
+     * @param newData
+     * @param merge
+     * @returns {Promise<{_id: String, _path: String}|{_id: *, _path}>}
+     */
     async updateDocument(_companyId, collection, _id, newData, merge) {
         _id = !_id && newData.uniqueId ? newData.data[newData.uniqueId] : _id;
         newData = newData.uniqueId  ? newData.data : newData;
@@ -215,6 +334,13 @@ class Servlet{
         return savedData;
     }
 
+    /**
+     * 
+     * @param _companyId
+     * @param collection
+     * @param newData
+     * @returns {Promise<google.datastore.v1.ICommitResponse>}
+     */
     async saveHistory(_companyId, collection, newData){
         let account = await this.getAccount() || {};
         let fields = Object.entries(newData).map(([key, value]) => {
@@ -234,6 +360,13 @@ class Servlet{
             .insert([row]);
     }
 
+    /**
+     * 
+     * @param _path
+     * @param newData
+     * @param merge
+     * @returns {Promise<{_path: *}>}
+     */
     async updateDocumentByPath(_path, newData, merge){
         let doc = await this.db.doc(_path).set(newData, {merge: !!merge});
         let savedData = {_path, ...newData};
@@ -241,6 +374,12 @@ class Servlet{
         return savedData;
     }
 
+    /**
+     * 
+     * @param _path
+     * @param newData
+     * @returns {Promise<google.datastore.v1.ICommitResponse[]>}
+     */
     async saveHistoryByPath(_path, newData){
         let splits = _path.split('/');
         return splits.length === 2 ?
@@ -248,6 +387,11 @@ class Servlet{
             this.saveHistory(splits[1], splits[2], {...newData, _id: splits[3]});
     }
 
+    /**
+     * 
+     * @param newData
+     * @returns {*}
+     */
     cleanObject(newData){
         Object.keys(newData).forEach(key => {
             if(newData[key] === undefined){
@@ -257,19 +401,43 @@ class Servlet{
         return newData;
     }
 
+    /**
+     * 
+     * @param _companyId
+     * @param collection
+     * @param _id
+     * @returns {Promise<{_id: String, _path: String, *}>}
+     */
     deleteDocument(_companyId, collection, _id) {
         return this.updateDocument(_companyId, collection, _id, {_deleted: new Date()}, true);
     }
 
+    /**
+     * 
+     * @param _path
+     * @returns {Promise<{_id: String, _path: String, _deleted:Date, *}>}
+     */
     deleteDocumentByPath(_path) {
         return this.updateDocumentByPath(_path, {_deleted: new Date()}, true);
     }
 
+    /**
+     * 
+     * @param _companyId
+     * @param collection
+     * @param _id
+     * @returns {Promise<null|{_id: String, _path: String, *}>}
+     */
     async getDocument(_companyId, collection, _id){
         let _pathCollection = _companyId !== 'default' && _companyId !== '' ? `company/${_companyId}/${collection}` : collection;
         return this.getDocumentByPath(`${_pathCollection}/${_id}`)
     }
 
+    /**
+     * 
+     * @param _path
+     * @returns {Promise<null|{_id: String, _path: String, *}>}
+     */
     async getDocumentByPath(_path){
         let doc = await this.db.doc(_path).get();
         if(doc.exists){
@@ -278,12 +446,24 @@ class Servlet{
         return null;
     }
 
+    /**
+     * 
+     * @param _companyId
+     * @param collection
+     * @param _ids
+     * @returns {Promise<Array<{_id: String, _path: String, *}>>}
+     */
     async getDocuments(_companyId, collection, _ids){
         let _pathCollection = _companyId === '' || _companyId === 'default' ? collection : `company/${_companyId}/${collection}`;
         let _paths = _ids.map(_id => `${_pathCollection}/${_id}`)
         return this.getDocumentsByPath(_paths);
     }
 
+    /**
+     * 
+     * @param _paths
+     * @returns {Promise<Array<{_id: String, _path: String, *}>>}
+     */
     async getDocumentsByPath(_paths){
         if(!_paths || _paths.length === 0){
             return [];
@@ -293,6 +473,13 @@ class Servlet{
         return snapshot.map(doc => {return {_id: doc.id, _path: doc.ref.path, ...doc.data()}});
     }
 
+    /**
+     * 
+     * @param _companyId
+     * @param collection
+     * @param conditions
+     * @returns {Promise<Array<{_id: String, _path: String, *}>>}
+     */
     async runQuery(_companyId, collection, conditions = []){
         let _pathCollection = _companyId === '' || _companyId === 'default' ? collection : `company/${_companyId}/${collection}`;
         let query = this.db.collection(_pathCollection).where('_deleted', '==', null);

@@ -1,19 +1,7 @@
-const Servlet = require('./../utils/Servlet.js');
+const Servlet = require('./Servlet.js');
 const fs = require("fs");
 
 class GetConfigs extends Servlet {
-
-    static get url(){
-        return '/GetConfigs';
-    }
-
-    async execute(){
-        let collection = this.req.param['collection'];
-        let folderName = this.req.param['folderName'];
-        let _companyId = this.req.param['_companyId'];
-        let forms = await this._getForms(`server/${folderName}`, collection, _companyId, false);
-        this.sendAsJson(Object.values(forms));
-    }
 
     async _getForms(folderName, collection, _companyId, justJSON){
         let formsFromFile = this._getConfigs(folderName);
@@ -25,9 +13,9 @@ class GetConfigs extends Servlet {
         return this._mergeForms(formsFromFile, formsDefault, forms, justJSON);
     }
 
-    _getConfigs(folderName){
+    _getConfigs(folderName) {
         let configs = {};
-        let folderPath = global.projectRoot+`${folderName}`;
+        let folderPath = global.projectRoot + `${folderName}`;
         fs.readdirSync(folderPath).forEach(file => {
             configs[file.split('.')[0]] = new Function("return " + fs.readFileSync(`${folderPath}/${file}`, 'utf8'))();
         });
@@ -40,9 +28,9 @@ class GetConfigs extends Servlet {
                 formsFromFile[key] :
                 {
                     code: formsFromFile[key],
-                    collection: key
+                    collection: key,
+                    _id:key
                 }
-
         });
 
 

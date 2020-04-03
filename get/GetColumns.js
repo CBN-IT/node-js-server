@@ -1,5 +1,4 @@
-const Servlet = require('./../utils/Servlet.js');
-const GetConfigs = require('./GetConfigs');
+const GetConfigs = require('../utils/GetConfigs');
 
 class GetColumns extends GetConfigs {
 
@@ -11,7 +10,11 @@ class GetColumns extends GetConfigs {
         let collection = 'column';
         let _companyId = this.req.param['_companyId'];
         let columns = await this._getForms('server/columns', collection, _companyId, false);
-        this.sendAsJson(Object.values(columns));
+        if (this.req.param._id) {
+            this.sendAsJson(columns[this.req.param._id]);
+        } else {
+            this.sendAsJson(Object.values(columns));
+        }
     }
 }
 

@@ -1,4 +1,4 @@
-const GetConfigs = require('../get/GetConfigs.js');
+const GetConfigs = require('./GetConfigs.js');
 const {_stringify} = require('./Utils.js');
 const fs = require("fs");
 const path = require("path");
