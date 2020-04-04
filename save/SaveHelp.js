@@ -4,15 +4,13 @@ const moment = require('moment');
 
 class SaveHelp extends SaveForm {
 
-    static get url(){
-        return '/SaveHelp';
-    }
+    static url = '/SaveHelp';
 
     get requiredLogin(){
         return false;
     }
 
-    async execute(){
+    async execute() {
         let newData = {
             ...await this.getUpdatedData(),
             date: moment().format("YYYY-MM-DD"),
@@ -20,7 +18,7 @@ class SaveHelp extends SaveForm {
         };
         let response = await this.updateDocument('default', "help", this.req.param._id, newData, false);
         await this.sendHelpMail(newData);
-        this.sendAsJson(response);
+        return response;
     }
 
     async sendHelpMail(document){

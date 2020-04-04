@@ -3,9 +3,7 @@ const {ValidationError} = require("../utils/errors");
 
 class SaveForm extends GetConfigs {
 
-    static get url(){
-        return '/SaveForm';
-    }
+    static url = '/SaveForm';
 
     async execute(){
         let collection = 'form';
@@ -26,8 +24,7 @@ class SaveForm extends GetConfigs {
             'code': code,
             '_deleted': null
         };
-        let document = await this.updateDocument(_companyId, collection, _id, newData);
-        this.sendAsJson(document)
+        return await this.updateDocument(_companyId, collection, _id, newData);
     }
 
 }

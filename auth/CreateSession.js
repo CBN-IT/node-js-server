@@ -2,9 +2,7 @@ const Servlet = require('./../utils/Servlet');
 const admin = require('firebase-admin');
 
 class CreateSession extends Servlet {
-    static get url() {
-        return '/CreateSession';
-    }
+    static url = '/CreateSession';
 
     get requiredLogin(){
         return false;

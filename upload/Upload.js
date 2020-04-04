@@ -8,9 +8,7 @@ let XLSX = require('xlsx');
 const Servlet = require('./../utils/Servlet.js');
 class Upload extends Servlet {
 
-    static get url(){
-        return '/Upload';
-    }
+    static url = '/Upload';
 
     async execute(){
         let workbook = XLSX.read(this.req.files[0].buffer, {
@@ -40,7 +38,7 @@ class Upload extends Servlet {
         }
         await Promise.all(promiseArr);
         //this.sendAsJson(rows);
-        this.sendAsJson(out);
+        return out;
     }
     async renameHeaders(rows){
         let headersToChange = {xlsHeader:"jsonHeader"};

@@ -3,9 +3,7 @@ const GetConfigs = require('../utils/GetConfigs');
 
 class SaveColumn extends GetConfigs {
 
-    static get url(){
-        return '/SaveColumn';
-    }
+    static url = '/SaveColumn';
 
     async execute() {
         let collection = 'column';
@@ -25,8 +23,7 @@ class SaveColumn extends GetConfigs {
             'code': code,
             '_deleted': null
         };
-        let document = await this.updateDocument(_companyId, collection, _id, newData);
-        this.sendAsJson(document)
+        return await this.updateDocument(_companyId, collection, _id, newData);
     }
 
 }

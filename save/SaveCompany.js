@@ -2,23 +2,21 @@ const SaveForm = require('./../utils/SaveForm.js');
 
 class SaveCompany extends SaveForm {
 
-    static get url(){
-        return '/SaveCompany';
-    }
+    static url = '/SaveCompany';
 
-    async execute(){
+    async execute() {
         this.req.param['_companyId'] = 'default';
         this.req.param['collection'] = 'company';
         let oldCompany = this.getDocument('', 'company', this.req.param._id);
         let newCompany = await this.save();
         await this.updateAccounts(oldCompany, newCompany);
-        this.sendAsJson(newCompany);
+        return newCompany;
 
     }
 
-    async updateAccounts(oldCompany, newCompany){
+    async updateAccounts(oldCompany, newCompany) {
         let promises = [];
-        if(oldCompany && oldCompany.blockedAccessCompany !== newCompany.blockedAccessCompany){
+        if (oldCompany && oldCompany.blockedAccessCompany !== newCompany.blockedAccessCompany) {
             let accounts = await this.runQuery('', 'account', [['_companyId', '==', newCompany._id]]);
             promises = accounts.map(account => this.updateDocument('', 'account', account._id, {blockedAccessCompany: newCompany.blockedAccessCompany}, true));
         }

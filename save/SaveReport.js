@@ -1,11 +1,9 @@
 const Servlet = require('./../utils/Servlet');
 class SaveReport extends Servlet {
 
-    static get url(){
-        return '/SaveReport';
-    }
+    static url = '/SaveReport';
 
-    async execute(){
+    async execute() {
         let collection = 'report';
         let _id = this.req.param['_id'];
         let _companyId = this.req.param['_companyId'];
@@ -18,8 +16,7 @@ class SaveReport extends Servlet {
             'params': this.req.param['params'],
             '_deleted': null
         };
-        let document = await this.updateDocument(_companyId, collection, _id, newData);
-        this.sendAsJson(document)
+        return await this.updateDocument(_companyId, collection, _id, newData);
     }
 
 }

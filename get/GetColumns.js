@@ -2,18 +2,16 @@ const GetConfigs = require('../utils/GetConfigs');
 
 class GetColumns extends GetConfigs {
 
-    static get url(){
-        return '/GetColumns';
-    }
+    static url = '/GetColumns';
 
-    async execute(){
+    async execute() {
         let collection = 'column';
         let _companyId = this.req.param['_companyId'];
         let columns = await this._getForms('server/columns', collection, _companyId, false);
         if (this.req.param._id) {
-            this.sendAsJson(columns[this.req.param._id]);
+            return columns[this.req.param._id];
         } else {
-            this.sendAsJson(Object.values(columns));
+            return Object.values(columns);
         }
     }
 }

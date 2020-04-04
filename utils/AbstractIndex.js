@@ -3,24 +3,24 @@ const {_stringify} = require('./Utils.js');
 const fs = require("fs");
 const path = require("path");
 
+/**
+ * @abstract
+ */
 class AbstractIndex extends GetConfigs{
 
-    get indexFile(){
-        return 'index.html';
-    }
+    indexFile = 'index.html';
+    requiredLogin = false;
+    
 
-    get requiredLogin(){
-        return false;
-    }
-    _redirectWithContinue(urlPath){
+    _redirectWithContinue(urlPath) {
         let url = new URL(this.req.protocol + '://' + this.req.get('host') + urlPath);
         url.searchParams.append("continue", this.req.url);
         this.res.redirect(url);
         return url.toString();
     }
-    async execute(){
+
+    async execute() {
         let user = await this.getUser();
-        console.log(this.req.url);
         if (user === null) {
             return this._redirectWithContinue('/login');
         }
@@ -39,7 +39,7 @@ class AbstractIndex extends GetConfigs{
         this.res.send(index.replace('"data_to_replace"', _stringify(data)));
     }
 
-    async _getData(){
+    async _getData() {
         let companies = await this.getAllUserCompanies();
         let _companyId = await this._getDefaultCompany(companies);
         let forms = await this._getForms('server/configs', 'form', _companyId, true);
@@ -60,30 +60,33 @@ class AbstractIndex extends GetConfigs{
         }, await this.getData(_companyId));
     }
 
-    getData(_companyId){
+    /**
+     * @abstract
+     * @param _companyId
+     * @returns {Object}
+     */
+    getData(_companyId) {
         return {};
     }
 
-    async _getReports(collection, _companyId){
+    async _getReports(collection, _companyId) {
         let allReports = await this.runQuery('', collection, []);
-        if(_companyId !== 'default'){
+        if (_companyId !== 'default') {
             let reports = await this.runQuery(_companyId, collection, []);
             allReports = [...allReports, ...reports];
         }
-
         return allReports;
     }
 
-    async _getDefaultCompany(companies){
+    async _getDefaultCompany(companies) {
         let account = await this.getAccount();
         let defaultOptions = account ? await this.getDocument('', 'defaultOptions', account.accountEmail) : null;
         let defaultCompany = this.req.param['_companyId'] ? this.req.param['_companyId'] : defaultOptions && defaultOptions.defaultCompany ? defaultOptions.defaultCompany : companies[0]._id;
-        if(defaultCompany !== '' && defaultCompany !== 'default' && (!defaultOptions || defaultCompany  !== defaultOptions.defaultCompany)){
-        this.updateDocument('', 'defaultOptions', account.accountEmail, {defaultCompany}, true);
+        if (defaultCompany !== '' && defaultCompany !== 'default' && (!defaultOptions || defaultCompany !== defaultOptions.defaultCompany)) {
+            this.updateDocument('', 'defaultOptions', account.accountEmail, {defaultCompany}, true);
         }
         return defaultCompany;
     }
-
 }
 
 module.exports = AbstractIndex;

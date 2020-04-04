@@ -2,6 +2,9 @@ const path = require('path');
 const fs = require("fs");
 const Servlet = require('./Servlet.js');
 
+/**
+ * @abstract
+ */
 class SaveForm extends Servlet {
 
     async saveWithMerge(newData) {

@@ -1,15 +1,12 @@
 const Servlet = require('./../utils/Servlet.js');
 class GetAccounts extends Servlet {
 
-    static get url(){
-        return '/GetAccounts';
-    }
+    static url = '/GetAccounts';
 
     async execute(){
         let collection = this.req.param['collection'];
         let _companyId = this.req.param['_companyId'];
-        let documents = await this.runQuery('', collection, [['_companyId', '==', _companyId]]);
-        this.sendAsJson(documents)
+        return await this.runQuery('', collection, [['_companyId', '==', _companyId]]);
     }
 }
 module.exports = GetAccounts;

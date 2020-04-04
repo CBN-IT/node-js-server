@@ -1,9 +1,7 @@
 const Servlet = require('./../utils/Servlet');
 
 class Logout  extends Servlet {
-    static get url() {
-        return ['/logout',"/logout/:error"];
-    }
+    static url = ['/logout',"/logout/:error"];
     get requiredLogin(){
         return false;
     }

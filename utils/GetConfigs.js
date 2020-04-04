@@ -1,6 +1,9 @@
 const Servlet = require('./Servlet.js');
 const fs = require("fs");
 
+/**
+ * @abstract
+ */
 class GetConfigs extends Servlet {
 
     async _getForms(folderName, collection, _companyId, justJSON){
