@@ -19,7 +19,7 @@ const getCircularReplacer = () => {
 };
 const redirectToHttps = (req, res, next) => {
     let url = new URL(req.protocol+"://"+req.headers.host);
-    req.log(req.protocol, req.headers.host, req.url);
+    console.log(req.protocol, req.headers.host, req.url);
     if (req.protocol !== 'http' ||
         (req.headers.host.indexOf('localhost') > -1 ||
             url.hostname.split(".").length >= 4)) {
