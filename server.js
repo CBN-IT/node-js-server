@@ -83,6 +83,7 @@ function addMappings(app, arr) {
 
 function startApp() {
     const app = express();
+    app.set('trust proxy', true);
     app.use('/robots.txt', function (req, res) {
         res.type('text/plain');
         res.send("User-agent: *\nDisallow: /");
