@@ -1,14 +1,26 @@
-const SaveForm = require('./../utils/SaveForm');
-const SendGrid = require('./../mail/SendGridMail.js');
+const SaveForm = require('./SaveForm');
+const SendGrid = require('../mail/SendGridMail.js');
 const moment = require('moment');
 
+/**
+ * @abstract
+ * @todo
+ */
 class SaveHelp extends SaveForm {
 
     static url = '/SaveHelp';
 
-    get requiredLogin(){
-        return false;
-    }
+    requiredLogin=false;
+    /**
+     *
+     * @type {string[]}
+     */
+    emailTo = ['octavianvoloaca@gmail.com', 'bogdan.nourescu@cbn-it.ro'];
+    /**
+     *
+     * @type {string}
+     */
+    emailFrom = 'office@cbn-it.ro';
 
     async execute() {
         let newData = {
@@ -29,8 +41,8 @@ class SaveHelp extends SaveForm {
             <div>Mesaj: ${document.message}</div>
         `;
         return SendGrid.sendHtmlMail(
-            ['octavianvoloaca@gmail.com', 'bogdan.nourescu@cbn-it.ro'],
-            'office@cbn-it.ro',
+            this.emailTo,
+            this.emailFrom,
             `Solicitare ajutor - ${this.req.param._companyId}`,
             html
         );

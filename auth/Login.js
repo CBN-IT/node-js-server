@@ -1,5 +1,5 @@
 const Servlet = require('./../utils/Servlet');
-const { v4: uuidv4 } = require('uuid');
+const { nanoid } = require('nanoid');
 const {_stringify} = require('./../utils/Utils');
 const fs = require("fs");
 const path = require("path");
@@ -25,7 +25,7 @@ class Login extends Servlet {
         let data = {};
         let cookie = this.req.cookies.csrfToken;
         if (cookie === undefined) {
-            data.csrfToken = uuidv4();
+            data.csrfToken = nanoid();
             this.res.cookie('csrfToken', data.csrfToken, {
                 maxAge: 10 * 60 * 1000,
                 httpOnly: true,
