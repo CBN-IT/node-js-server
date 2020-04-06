@@ -4,9 +4,8 @@ const admin = require('firebase-admin');
 class CreateSession extends Servlet {
     static url = '/CreateSession';
 
-    get requiredLogin(){
-        return false;
-    }
+    requiredLogin = false;
+
 
     async execute() {
         if (this.req.param.csrfToken !== this.req.cookies.csrfToken) {
@@ -25,11 +24,11 @@ class CreateSession extends Servlet {
                 const options = {
                     maxAge: expiresIn,
                     httpOnly: true,
-                    secure: this.req.protocol==="https",
+                    secure: this.req.protocol === "https",
                     sameSite: "lax"
                 };
                 this.res.cookie('session', sessionCookie, options);
-                this.res.clearCookie('csrfToken',options);
+                this.res.clearCookie('csrfToken', options);
                 this.res.end(JSON.stringify({status: 'success'}));
             }, error => {
                 this.res.status(401).send('UNAUTHORIZED REQUEST!');

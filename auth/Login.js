@@ -1,5 +1,5 @@
 const Servlet = require('./../utils/Servlet');
-const { nanoid } = require('nanoid');
+const {nanoid} = require('nanoid');
 const {_stringify} = require('./../utils/Utils');
 const fs = require("fs");
 const path = require("path");
@@ -7,9 +7,8 @@ const path = require("path");
 class Login extends Servlet {
     static url = ["/login/:error/:extraError", "/login/:error", "/login", "/admin/login/:error/:extraError", "/admin/login/:error", "/admin/login"];
 
-    get requiredLogin() {
-        return false;
-    }
+    requiredLogin = false;
+
 
     async execute() {
         let index = fs.readFileSync(path.join(global.projectRoot, "web", this.indexFile), 'utf8');

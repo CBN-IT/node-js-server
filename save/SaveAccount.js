@@ -6,9 +6,9 @@ class SaveAccount extends SaveForm {
     get requiredUserType(){
         return ["Admin"];
     }
-    get requiredLogin(){
-        return true;
-    }
+
+    requiredLogin = true;
+
     async execute(){
         let _companyId = this.req.param['_companyId'];
         this.req.param['_companyId'] = 'default';

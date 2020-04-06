@@ -1,17 +1,16 @@
 const Servlet = require('./../utils/Servlet');
 
-class Logout  extends Servlet {
-    static url = ['/logout',"/logout/:error"];
-    get requiredLogin(){
-        return false;
-    }
+class Logout extends Servlet {
+    static url = ['/logout', "/logout/:error"];
+    requiredLogin = false;
+
     async execute() {
         const options = {
             httpOnly: true,
-            secure: this.req.protocol==="https",
+            secure: this.req.protocol === "https",
             sameSite: "lax"
         };
-        this.res.clearCookie('session',options);
+        this.res.clearCookie('session', options);
         if (this.req.param.error) {
             this.res.redirect('/login/' + this.req.param.error);
         } else {
