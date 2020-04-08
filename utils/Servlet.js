@@ -340,9 +340,10 @@ class Servlet {
             accountEmail: account.accountEmail,
             field: fields
         };
-        return await this.bigQueryDb.dataset("history")
+        return this.bigQueryDb.dataset("history")
             .table("history")
-            .insert([row]);
+            .insert([row])
+            .catch(() => {});
     }
 
     /**

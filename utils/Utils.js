@@ -1,4 +1,4 @@
-const {TimeoutError} =require("./errors");
+const {TimeoutError} = require("./errors");
 
 const timeout = (nrSec) => {
     return new Promise(function (resolve, reject) {
@@ -18,11 +18,11 @@ const getCircularReplacer = () => {
     };
 };
 const redirectToHttps = (req, res, next) => {
-    let url = new URL(req.protocol+"://"+req.headers.host);
+    let url = new URL(req.protocol + "://" + req.headers.host);
     if (req.protocol !== 'http' ||
         (req.headers.host.indexOf('localhost') > -1 ||
             url.hostname.split(".").length >= 4)) {
-        /*appengine subdomain doesnt allow https on second level subdomain*/
+        // appengine subdomain doesn't allow https on second level subdomain
         // request was via https, so do no special handling
         next();
     } else {
@@ -30,26 +30,27 @@ const redirectToHttps = (req, res, next) => {
         res.redirect('https://' + req.headers.host + req.url);
     }
 };
-function unflat(obj){
+
+function unflat(obj) {
     let entry = Object.entries(obj);
-    for(let [key,value] of entry){
-        if(key.includes(".")){
+    for (let [key, value] of entry) {
+        if (key.includes(".")) {
             let keys = key.split(/[.]+/g);
             let o = obj;
             for (let i = 1; i < keys.length; i++) {
                 if (keys[i].match(/[0-9]+/g)) {
-                    if (o[keys[i-1]] === undefined) {
-                        o[keys[i-1]] = [];
+                    if (o[keys[i - 1]] === undefined) {
+                        o[keys[i - 1]] = [];
                     }
-                    o = o[keys[i-1]];
-                }else{
-                    if (o[keys[i-1]] === undefined) {
-                        o[keys[i-1]] = {};
+                    o = o[keys[i - 1]];
+                } else {
+                    if (o[keys[i - 1]] === undefined) {
+                        o[keys[i - 1]] = {};
                     }
-                    o = o[keys[i-1]];
+                    o = o[keys[i - 1]];
                 }
             }
-            o[keys[keys.length-1]] = value;
+            o[keys[keys.length - 1]] = value;
         }
     }
     return obj;
@@ -73,19 +74,19 @@ const requestParam = (req, res, next) => {
             }
             return undefined;
         },
-        set(target, name,value) {
+        set(target, name, value) {
             if (target.body[name] !== undefined) {
                 target.body[name] = value;
             } else if (target.query[name] !== undefined) {
-                target.query[name]= value;
+                target.query[name] = value;
             } else if (target.params[name] !== undefined) {
-                target.params[name]= value;
+                target.params[name] = value;
             } else {
                 target.body[name] = value;
             }
             return true;
         },
-        has(target, name){
+        has(target, name) {
             return target.body[name] !== undefined || target.query[name] !== undefined || target.params[name] !== undefined;
         },
         getOwnPropertyDescriptor(target, name) {
@@ -94,7 +95,7 @@ const requestParam = (req, res, next) => {
                 configurable: true,
             };
         },
-        ownKeys(target){
+        ownKeys(target) {
             return [
                 ...Object.keys(target.params),
                 ...Object.keys(target.query),
@@ -105,22 +106,16 @@ const requestParam = (req, res, next) => {
     next();
 };
 
-const _INDENT     = '    ';
 const _WHITESPACE = new Array(512).fill(' ').join('');
 
-const _format_date = function(n) {
+const _format_date = function (n) {
     return n < 10 ? '0' + n : '' + n;
 };
 
-const _stringify = function(data, indent) {
-
+const _stringify = function (data, indent) {
     indent = typeof indent === 'string' ? indent : '';
-
-
     let str = '';
-
-    if (
-        typeof data === 'boolean'
+    if (typeof data === 'boolean'
         || data === null
         || data === undefined
         || (
@@ -159,10 +154,10 @@ const _stringify = function(data, indent) {
 
     } else if (typeof data === 'function') {
 
-        let body   = data.toString().split('\n');
+        let body = data.toString().split('\n');
         let offset = 0;
 
-        let first = body.find(function(ch) {
+        let first = body.find(function (ch) {
             return ch.startsWith('\t');
         }) || null;
 
@@ -192,12 +187,10 @@ const _stringify = function(data, indent) {
     } else if (data instanceof Array) {
         //str += JSON.stringify(data);
 
-        let is_primitive = data.find(function(val) {
-            return val instanceof Object || typeof val === 'function';
-        }) === undefined;
+        let is_primitive = data.find(val => val instanceof Object || typeof val === 'function') === undefined;
 
-        let dimension = Math.sqrt(data.length, 2);
-        let is_matrix = dimension === (dimension | 0);
+        let dimension = Math.sqrt(data.length);
+        let is_matrix = dimension === Math.round(dimension);
 
         if (data.length === 0) {
 
@@ -212,7 +205,7 @@ const _stringify = function(data, indent) {
             }
 
 
-            str  = indent;
+            str = indent;
             str += '[\n';
 
             for (let y = 0; y < dimension; y++) {
@@ -246,7 +239,7 @@ const _stringify = function(data, indent) {
 
         } else if (is_primitive === true) {
 
-            str  = indent;
+            str = indent;
             str += '[';
 
             for (let d = 0, dl = data.length; d < dl; d++) {
@@ -269,7 +262,7 @@ const _stringify = function(data, indent) {
 
         } else {
 
-            str  = indent;
+            str = indent;
             str += '[\n';
 
             for (let d = 0, dl = data.length; d < dl; d++) {
@@ -290,15 +283,15 @@ const _stringify = function(data, indent) {
 
     } else if (data instanceof Date) {
 
-        str  = indent;
+        str = indent;
 
         str += '"';
-        str += data.getUTCFullYear()                + '-';
+        str += data.getUTCFullYear() + '-';
         str += _format_date(data.getUTCMonth() + 1) + '-';
-        str += _format_date(data.getUTCDate())      + 'T';
-        str += _format_date(data.getUTCHours())     + ':';
-        str += _format_date(data.getUTCMinutes())   + ':';
-        str += _format_date(data.getUTCSeconds())   + 'Z';
+        str += _format_date(data.getUTCDate()) + 'T';
+        str += _format_date(data.getUTCHours()) + ':';
+        str += _format_date(data.getUTCMinutes()) + ':';
+        str += _format_date(data.getUTCSeconds()) + 'Z';
         str += '"';
 
     } else if (data instanceof Object) {
@@ -310,7 +303,7 @@ const _stringify = function(data, indent) {
 
         } else {
 
-            str  = indent;
+            str = indent;
             str += '{\n';
 
             for (let k = 0, kl = keys.length; k < kl; k++) {
