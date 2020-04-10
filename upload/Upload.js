@@ -4,46 +4,47 @@ const client = new v2beta3.CloudTasksClient();
 let XLSX = require('xlsx');
 
 
-
 const Servlet = require('./../utils/Servlet.js');
+
 class Upload extends Servlet {
 
     static url = '/Upload';
 
-    async execute(){
+    async execute() {
         let workbook = XLSX.read(this.req.files[0].buffer, {
-            type:'buffer',
+            type: 'buffer',
             cellDates: true,
             dateNF: 'yyyy-mm-dd',
         });
-        let rows=XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]], {
-            raw:false,
-            defval:""
+        let rows = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]], {
+            raw: false,
+            defval: ""
         });
         let promiseArr = [];
         //await this.renameHeaders(rows);
-        let out =this._processGroupByHeaders(rows);
-        for(let i=0;i<out.length;i++){
+        let out = this._processGroupByHeaders(rows);
+        for (let i = 0; i < out.length; i++) {
             this.logger.d(out[i]);
             promiseArr.push(createHttpTaskWithToken({
-                project:process.env.GOOGLE_CLOUD_PROJECT,
-                location:process.env.GAE_LOCATION,
-                payload:JSON.stringify({
+                project: process.env.GOOGLE_CLOUD_PROJECT,
+                location: process.env.GAE_LOCATION,
+                payload: JSON.stringify({
                     ...out[i],
-                    _companyId:this.req.param._companyId,
-                    collection:this.req.param.collection
+                    _companyId: this.req.param._companyId,
+                    collection: this.req.param.collection
                 }),
-                url:this.req.protocol + "://" + this.req.get('host')+this.saveUrl
+                url: this.req.protocol + "://" + this.req.get('host') + this.saveUrl
             }));
         }
         await Promise.all(promiseArr);
         //this.sendAsJson(rows);
         return out;
     }
-    async renameHeaders(rows){
-        let headersToChange = {xlsHeader:"jsonHeader"};
-        for(let i=0;i<rows.length;i++){
-            for (let j in rows[i]){
+
+    async renameHeaders(rows) {
+        let headersToChange = {xlsHeader: "jsonHeader"};
+        for (let i = 0; i < rows.length; i++) {
+            for (let j in rows[i]) {
                 if (!rows[i].hasOwnProperty(j)) continue;
 
                 if (headersToChange[j] !== undefined) {
@@ -53,13 +54,15 @@ class Upload extends Servlet {
             }
         }
     }
-    _processGroupByHeaders(rows){
-        let out =[{otherRows:rows}];
+
+    _processGroupByHeaders(rows) {
+        let out = [{otherRows: rows}];
         this._groupByHeaders(out);
         delete out[0].otherRows;
         return out;
     }
-    _groupByHeaders(rows, h){
+
+    _groupByHeaders(rows, h) {
         if (h === undefined) {
             h = 0;
         }
@@ -89,52 +92,50 @@ class Upload extends Servlet {
                     this._groupByHeaders(out, n);
                 }
             }
-            for(let o=0;o<out.length;o++){
-                out[o].otherRows=undefined;
+            for (let o = 0; o < out.length; o++) {
+                out[o].otherRows = undefined;
             }
         }
     }
-    _getUniqueIdVal(row, grH){
-        let h=grH.uniqueId;
-        let kind=grH.name;
+
+    _getUniqueIdVal(row, grH) {
+        let h = grH.uniqueId;
+        let kind = grH.name;
         let r = [];
-        for(let i=0;i<h.length;i++){
-            r.push(row[kind+"."+h[i]]);
+        for (let i = 0; i < h.length; i++) {
+            r.push(row[kind + "." + h[i]]);
         }
         return r.join("|");
     }
-    get groupByHeaders(){
+
+    get groupByHeaders() {
         return []
     }
-    get saveUrl(){
+
+    get saveUrl() {
         return "/SaveClient"
     }
 }
+
 module.exports = Upload;
 
 
-
 async function createHttpTaskWithToken({
-    project = 'mso-converter', // Your GCP Project id
-    queue = 'default', // Name of your Queue
-    location = 'us-central1', // The GCP region of your queue
-    url = 'https://raport-test.cbn-it.ro/', // The full url path that the request will be sent to
-    email = 'task-invoker@mso-converter.iam.gserviceaccount.com', // Cloud IAM service account
-    payload = 'Hello, World!', // The task HTTP request body
-    inSeconds = 0 // Delay in task execution
-}) {
+                                           project = 'mso-converter', // Your GCP Project id
+                                           queue = 'default', // Name of your Queue
+                                           location = 'us-central1', // The GCP region of your queue
+                                           url = 'https://raport-test.cbn-it.ro/', // The full url path that the request will be sent to
+                                           payload = 'Hello, World!', // The task HTTP request body
+                                           inSeconds = 0 // Delay in task execution
+                                       }) {
 
     const task = {
         httpRequest: {
             httpMethod: 'POST',
             headers: {
-                "Content-Type":"application/json"
+                "Content-Type": "application/json"
             },
             url,
-            /*oidcToken: {
-                serviceAccountEmail: email,
-            },*/
-
         },
     };
 

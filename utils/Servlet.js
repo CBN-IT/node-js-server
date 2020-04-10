@@ -4,17 +4,38 @@ const admin = require('firebase-admin');
 const {BigQuery} = require('@google-cloud/bigquery');
 
 /**
+ * A database document
+ * @typedef {Object} DatabaseDocument
+ * @property {String} _id the id of the document
+ * @property {String} _path the path of the document in the database. it can have 2 formats: company/company_id/collection/_id or collection/_id
+ */
+
+/**
+ * A company entity
+ * @typedef {DatabaseDocument} Company
+ * @property {String} companyName
+ * @property {String} companyId
+ * @property {String} companyType
+ */
+
+/**
+ * A database document or null
+ * @typedef {null|DatabaseDocument} NullableDatabaseDocument
+ */
+
+
+/**
  * This is the base class for all the API calls <br />
  * You need to override it and override <br/>
- * @abstract
  * {@link Servlet#execute} <br/>
  * {@link Servlet.url} <br/>
+ * @abstract
  */
 class Servlet {
 
     /**
-     * @type {string|Array}
      * @abstract
+     * @type {string|Array}
      */
     static url = null;
 
@@ -61,7 +82,6 @@ class Servlet {
     }
 
     /**
-     *
      * @private
      */
     _initializeAppAndDatabase() {
@@ -75,7 +95,6 @@ class Servlet {
     }
 
     /**
-     *
      * @returns {Promise<null|admin.auth.DecodedIdToken>}
      */
     async getUser() {
@@ -92,8 +111,7 @@ class Servlet {
     }
 
     /**
-     *
-     * @returns {Promise<Array<Company>>}
+     * @returns {Promise<Company[]>}
      */
     async getAllUserCompanies() {
         let user = await this.getUser();
@@ -122,7 +140,7 @@ class Servlet {
 
     /**
      *
-     * @returns {Promise<Array<Company>>}
+     * @returns {Promise<Company[]>}
      * @private
      */
     async _getAllUserCompaniesAdmin() {
@@ -164,13 +182,15 @@ class Servlet {
                 if (_companyId) {
                     for (let i = 0; i < accounts.length; i++) {
                         if (accounts[i].accountType === "SuperAdmin") {
-                            return this._account = this._getSuperAdminCont(user, _companyId);
+                            this._account = this._getSuperAdminCont(user, _companyId);
+                            return this._account;
                         } else if (accounts[i]._companyId === _companyId) {
-                            return this._account = accounts[i];
+                            this._account = accounts[i];
+                            return this._account;
                         }
                     }
                 } else {
-                    return this._account = accounts.length > 0 ? accounts[0] : null;
+                    this._account = accounts.length > 0 ? accounts[0] : null;
                 }
             }
         }
@@ -184,7 +204,10 @@ class Servlet {
      * @private
      */
     _isAdmin(user) {
-        return user !== null && (user.email === 'octavianvoloaca@gmail.com' || user.email === 'bogdan.nourescu@cbn-it.ro');
+        return user !== null && (
+            user.email === 'octavianvoloaca@gmail.com' ||
+            user.email === 'bogdan.nourescu@cbn-it.ro'
+        );
     }
 
     /**
@@ -195,7 +218,10 @@ class Servlet {
         if (this.requiredParams.length === 0) {
             return true;
         }
-        let missingParams = this.requiredParams.filter(param => this.req.param[param] == null);
+        let missingParams = this.requiredParams.filter(param =>
+            this.req.param[param] == null ||
+            this.req.param[param] === "" ||
+            (param === "_companyId" && this.req.param[param] === "default"));
         if (missingParams.length === 0) {
             return true;
         }
@@ -255,7 +281,7 @@ class Servlet {
     }
 
     /**
-     * Execute the code and call sendAsJson
+     * Execute the code and return the value to send as response
      * @returns {Promise<String|Object|Array|void>}
      * @abstract
      */
@@ -266,7 +292,7 @@ class Servlet {
     /**
      *
      * @param snapshot
-     * @returns {Array<Object>}
+     * @returns {DatabaseDocument[]}
      */
     processDocuments(snapshot) {
         let toReturn = [];
@@ -302,7 +328,7 @@ class Servlet {
      * @param _id
      * @param newData
      * @param merge
-     * @returns {Promise<{_id: String, _path: String}|{_id: *, _path}>}
+     * @returns {Promise<DatabaseDocument>}
      */
     async updateDocument(_companyId, collection, _id, newData, merge) {
         _id = !_id && newData.uniqueId ? newData.data[newData.uniqueId] : _id;
@@ -343,7 +369,8 @@ class Servlet {
         return this.bigQueryDb.dataset("history")
             .table("history")
             .insert([row])
-            .catch(() => {});
+            .catch(() => {
+            });
     }
 
     /**
@@ -351,7 +378,7 @@ class Servlet {
      * @param _path
      * @param newData
      * @param merge
-     * @returns {Promise<{_path: *}>}
+     * @returns {Promise<DatabaseDocument>}
      */
     async updateDocumentByPath(_path, newData, merge) {
         let doc = await this.db.doc(_path).set(newData, {merge: !!merge});
@@ -392,7 +419,7 @@ class Servlet {
      * @param _companyId
      * @param collection
      * @param _id
-     * @returns {Promise<{_id: String, _path: String, *}>}
+     * @returns {Promise<DatabaseDocument>}
      */
     deleteDocument(_companyId, collection, _id) {
         return this.updateDocument(_companyId, collection, _id, {_deleted: new Date()}, true);
@@ -401,7 +428,7 @@ class Servlet {
     /**
      *
      * @param _path
-     * @returns {Promise<{_id: String, _path: String, _deleted:Date, *}>}
+     * @returns {Promise<DatabaseDocument>}
      */
     deleteDocumentByPath(_path) {
         return this.updateDocumentByPath(_path, {_deleted: new Date()}, true);
@@ -412,7 +439,7 @@ class Servlet {
      * @param _companyId
      * @param collection
      * @param _id
-     * @returns {Promise<null|{_id: String, _path: String, *}>}
+     * @returns {Promise<NullableDatabaseDocument>}
      */
     async getDocument(_companyId, collection, _id) {
         let _pathCollection = _companyId !== 'default' && _companyId !== '' ? `company/${_companyId}/${collection}` : collection;
@@ -422,7 +449,7 @@ class Servlet {
     /**
      *
      * @param _path
-     * @returns {Promise<null|{_id: String, _path: String, *}>}
+     * @returns {Promise<NullableDatabaseDocument>}
      */
     async getDocumentByPath(_path) {
         let doc = await this.db.doc(_path).get();
@@ -437,7 +464,7 @@ class Servlet {
      * @param _companyId
      * @param collection
      * @param _ids
-     * @returns {Promise<Array<{_id: String, _path: String, *}>>}
+     * @returns {Promise<DatabaseDocument[]>}
      */
     async getDocuments(_companyId, collection, _ids) {
         let _pathCollection = _companyId === '' || _companyId === 'default' ? collection : `company/${_companyId}/${collection}`;
@@ -448,7 +475,7 @@ class Servlet {
     /**
      *
      * @param _paths
-     * @returns {Promise<Array<{_id: String, _path: String, *}>>}
+     * @returns {Promise<DatabaseDocument[]>}
      */
     async getDocumentsByPath(_paths) {
         if (!_paths || _paths.length === 0) {
@@ -466,7 +493,7 @@ class Servlet {
      * @param _companyId
      * @param collection
      * @param conditions
-     * @returns {Promise<Array<{_id: String, _path: String, *}>>}
+     * @returns {Promise<DatabaseDocument[]>}
      */
     async runQuery(_companyId, collection, conditions = []) {
         let _pathCollection = _companyId === '' || _companyId === 'default' ? collection : `company/${_companyId}/${collection}`;

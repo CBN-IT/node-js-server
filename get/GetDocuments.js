@@ -2,7 +2,7 @@ const Servlet = require('./../utils/Servlet.js');
 class GetDocuments extends Servlet {
 
     static url = '/GetDocuments';
-    requiredParams = ["_companyId","collection"];
+    requiredParams = ["collection"];
 
     async execute(){
         let collection = this.req.param['collection'];

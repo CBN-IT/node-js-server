@@ -1,7 +1,7 @@
 const {TimeoutError} = require("./errors");
 
 const timeout = (nrSec) => {
-    return new Promise(function (resolve, reject) {
+    return new Promise((resolve, reject) => {
         setTimeout(reject, nrSec * 1000, new TimeoutError('TIMEOUT ' + nrSec + "s"));
     });
 };
@@ -112,7 +112,7 @@ const _format_date = function (n) {
     return n < 10 ? '0' + n : '' + n;
 };
 
-const _stringify = function (data, indent) {
+const _stringify = (data, indent) => {
     indent = typeof indent === 'string' ? indent : '';
     let str = '';
     if (typeof data === 'boolean'
@@ -157,9 +157,7 @@ const _stringify = function (data, indent) {
         let body = data.toString().split('\n');
         let offset = 0;
 
-        let first = body.find(function (ch) {
-            return ch.startsWith('\t');
-        }) || null;
+        let first = body.find(ch => ch.startsWith('\t')) || null;
 
         if (first !== null) {
 

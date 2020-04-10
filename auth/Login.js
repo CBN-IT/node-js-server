@@ -6,7 +6,6 @@ const path = require("path");
 
 class Login extends Servlet {
     static url = ["/login/:error/:extraError", "/login/:error", "/login", "/admin/login/:error/:extraError", "/admin/login/:error", "/admin/login"];
-
     requiredLogin = false;
 
 

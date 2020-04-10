@@ -6,12 +6,15 @@ class CreateSession extends Servlet {
     static url = '/CreateSession';
 
     requiredLogin = false;
-
+    requiredParams = ["csrfToken", "idToken"];
 
     async execute() {
         if (this.req.param.csrfToken !== this.req.cookies.csrfToken) {
-            this.logger.w(this.req.param.csrfToken, this.req.cookies.csrfToken);
-            throw new AuthenticationError("csrfToken from param does not match the value in cookies");
+            let error = new AuthenticationError("csrfToken from param does not match the value in cookies");
+            error.csrfTokenParam = this.req.param.csrfToken;
+            error.csrfTokenCookie = this.req.cookies.csrfToken;
+
+            throw error;
         }
         const expiresIn = 14 * 24 * 60 * 60 * 1000;
         // Create the session cookie. This will also verify the ID token in the process.

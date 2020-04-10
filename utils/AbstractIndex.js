@@ -6,11 +6,11 @@ const path = require("path");
 /**
  * @abstract
  */
-class AbstractIndex extends GetConfigs{
+class AbstractIndex extends GetConfigs {
 
     indexFile = 'index.html';
     requiredLogin = false;
-    
+
 
     _redirectWithContinue(urlPath) {
         let url = new URL(this.req.protocol + '://' + this.req.get('host') + urlPath);
@@ -22,17 +22,21 @@ class AbstractIndex extends GetConfigs{
     async execute() {
         let user = await this.getUser();
         if (user === null) {
-            return this._redirectWithContinue('/login');
+            this._redirectWithContinue('/login');
+            return
         }
         let account = await this.getAccount();
         if (account === null || account === undefined) {
-            return this._redirectWithContinue('/login/no-account/' + user.email);
+            this._redirectWithContinue('/login/no-account/' + user.email);
+            return
         }
         if (account.blockedAccess === true) {
-            return this._redirectWithContinue('/login/account-ban/' + user.email);
+            this._redirectWithContinue('/login/account-ban/' + user.email);
+            return;
         }
         if (account.blockedAccessCompany === true) {
-            return this._redirectWithContinue('/login/company-ban/' + account._companyName);
+            this._redirectWithContinue('/login/company-ban/' + account._companyName);
+            return
         }
         let index = fs.readFileSync(path.join(global.projectRoot, "web", this.indexFile), 'utf8');
         let data = await this._getData();
@@ -41,14 +45,12 @@ class AbstractIndex extends GetConfigs{
 
     async _getData() {
         let companies = await this.getAllUserCompanies();
+        companies.sort((a, b) => a.companyName.localeCompare(b.companyName));
         let _companyId = await this._getDefaultCompany(companies);
         let forms = await this._getForms('server/configs', 'form', _companyId, true);
         let columns = await this._getForms('server/columns', 'column', _companyId, true);
         let reports = await this._getReports('report', _companyId, true);
 
-
-        // let invoiceSettings = await this.getDocument(_firmId, 'setari', 'setariFactura');
-        // let invoiceSettings = await this.getDocument(_firmId, 'setari', 'setariFactura');
         return Object.assign({
             _appId: process.env.GOOGLE_CLOUD_PROJECT,
             _configs: forms,
