@@ -72,8 +72,10 @@ function addMappings(app, arr) {
                     res.status(422);
                 } else {
                     req.log.s(error);
+
                     res.status(500);
                 }
+                req.log.d(JSON.parse(JSON.stringify(req.param)));
                 res.setHeader('Content-Type', 'application/json; charset=UTF-8');
                 res.send(JSON.stringify(error));
             }

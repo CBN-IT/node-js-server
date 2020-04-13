@@ -53,6 +53,7 @@ class AbstractIndex extends GetConfigs {
 
         return Object.assign({
             _appId: process.env.GOOGLE_CLOUD_PROJECT,
+            NODE_ENV: process.env.NODE_ENV,
             _configs: forms,
             _columns: columns,
             _reports: reports,

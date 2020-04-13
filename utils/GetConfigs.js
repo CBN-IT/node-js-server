@@ -20,7 +20,9 @@ class GetConfigs extends Servlet {
         let configs = {};
         let folderPath = global.projectRoot + `${folderName}`;
         fs.readdirSync(folderPath).forEach(file => {
-            configs[file.split('.')[0]] = new Function("return " + fs.readFileSync(`${folderPath}/${file}`, 'utf8'))();
+            if (file.split('.')[1] === "json") {
+                configs[file.split('.')[0]] = new Function("return " + fs.readFileSync(`${folderPath}/${file}`, 'utf8'))();
+            }
         });
         return configs;
     }
