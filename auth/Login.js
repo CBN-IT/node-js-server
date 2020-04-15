@@ -22,8 +22,8 @@ class Login extends Servlet {
     async _getData() {
         let data = {};
         let cookie = this.req.cookies.csrfToken;
-        if (cookie === undefined) {
-            data.csrfToken = nanoid();
+        if (cookie === undefined || cookie === "") {
+            data.csrfToken = nanoid(100);
             this.res.cookie('csrfToken', data.csrfToken, {
                 maxAge: 10 * 60 * 1000,
                 httpOnly: true,
