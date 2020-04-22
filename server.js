@@ -15,10 +15,18 @@ const PORT = process.env.PORT || 8080;
 const NODE_ENV = process.env.NODE_ENV;
 const BASE = (NODE_ENV === 'development') ? 'build/dev/' : '';
 
+let lastModified = new Date(Number((process.env.GAE_DEPLOYMENT_ID||0)*1/ (2 << 27) * 1000)).toUTCString()
+
 function addStatic(app, map) {
     for (let i in map) {
         if (!map.hasOwnProperty(i)) continue;
-        app.use(i, express.static(map[i]));
+        app.use(i, express.static(map[i],{
+            setHeaders: (res, path) => {
+                if (path.endsWith('.html')) {
+                    res.setHeader('Last-Modified', lastModified)
+                }
+            },
+        }));
     }
 }
 
