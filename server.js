@@ -22,7 +22,7 @@ function addStatic(app, map) {
         if (!map.hasOwnProperty(i)) continue;
         app.use(i, express.static(map[i],{
             setHeaders: (res, path) => {
-                if (path.endsWith('.html')) {
+                if (path.endsWith('.js')) {
                     res.setHeader('Last-Modified', lastModified)
                 }
             },
