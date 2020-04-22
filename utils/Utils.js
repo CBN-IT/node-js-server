@@ -20,8 +20,8 @@ const getCircularReplacer = () => {
 const redirectToHttps = (req, res, next) => {
     let url = new URL(req.protocol + "://" + req.headers.host);
     if (req.protocol !== 'http' ||
-        (req.headers.host.indexOf('localhost') > -1 ||
-            url.hostname.split(".").length >= 4)) {
+        req.headers.host.indexOf('localhost') > -1 ||
+        url.hostname.split(".").length >= 4) {
         // appengine subdomain doesn't allow https on second level subdomain
         // request was via https, so do no special handling
         next();

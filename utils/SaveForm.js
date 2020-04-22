@@ -31,14 +31,15 @@ class SaveForm extends Servlet {
         } : this._getFormData(this.config);
     }
 
-    _getFormData(config) {
+    _getFormData(config,reqData = this.req.param) {
+
         let newData = {_deleted: null};
         config.elements.forEach(field => {
             if (field['dbType'] === 'address') {
-                this._processAdress(newData, field);
+                this._processAdress(newData, field, reqData);
                 return;
             }
-            let value = this._getValue(field.multiple, this.req.param[field.name], field.type);
+            let value = this._getValue(field.multiple, reqData[field.name], field.type);
             if (value !== undefined) {
                 switch (field['dbType']) {
                     case 'string':
@@ -62,12 +63,12 @@ class SaveForm extends Servlet {
                         break;
                     case 'file':
                         newData[field.name] = value;
-                        newData[field.name + "_urls"] = this._getValue(field.multiple, this.req.param[field.name + "_urls"], field.type);
+                        newData[field.name + "_urls"] = this._getValue(field.multiple, reqData[field.name + "_urls"], field.type);
                         break;
                 }
             }
-            if (field.type === 'select' && field['saveLabel'] && this.req.param[`${field.name}_label`]) {
-                newData[`${field.name}_label`] = this.req.param[`${field.name}_label`];
+            if (field.type === 'select' && field['saveLabel'] && reqData[`${field.name}_label`]) {
+                newData[`${field.name}_label`] = reqData[`${field.name}_label`];
             }
         });
         if (config.label) {
@@ -93,16 +94,16 @@ class SaveForm extends Servlet {
         return value;
     }
 
-    _processAdress(newData, field) {
-        if (this.req.param[`${field.name}.id`]) {
-            newData[`${field.name}_label`] = this.req.param[`${field.name}_label`];
+    _processAdress(newData, field, reqData) {
+        if (reqData[`${field.name}.id`]) {
+            newData[`${field.name}_label`] = `${reqData[`${field.name}.prescurtare_judet`]}, ${reqData[`${field.name}.nume_superior`]}, ${reqData[`${field.name}.nume_localitate`]}`.trim();
             newData[field.name] = {
-                nume_localitate: this.req.param[`${field.name}.nume_localitate`] || "",
-                nume_superior: this.req.param[`${field.name}.nume_superior`] || "",
-                nume_judet: this.req.param[`${field.name}.nume_judet`] || "",
-                id: this.req.param[`${field.name}.id`] || "",
-                ancestor: this.req.param[`${field.name}.ancestor`] || "",
-                label: this.req.param[`${field.name}_label`] || ""
+                nume_localitate: reqData[`${field.name}.nume_localitate`] || "",
+                nume_superior: reqData[`${field.name}.nume_superior`] || "",
+                nume_judet: reqData[`${field.name}.nume_judet`] || "",
+                id: reqData[`${field.name}.id`] || "",
+                ancestor: reqData[`${field.name}.ancestor`] || "",
+                label: reqData[`${field.name}_label`] || ""
             };
         } else {
             newData[`${field.name}_label`] = '';

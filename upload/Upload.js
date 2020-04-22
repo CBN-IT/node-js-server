@@ -4,9 +4,9 @@ const client = new v2beta3.CloudTasksClient();
 let XLSX = require('xlsx');
 
 
-const Servlet = require('./../utils/Servlet.js');
+const SaveForm = require('./../utils/SaveForm.js');
 
-class Upload extends Servlet {
+class Upload extends SaveForm {
 
     static url = '/Upload';
 
@@ -18,14 +18,16 @@ class Upload extends Servlet {
         });
         let rows = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]], {
             raw: false,
-            defval: ""
+            defval: "",
+            blankrows: false
         });
         let promiseArr = [];
-        //await this.renameHeaders(rows);
+        rows = await this.renameHeaders(rows);
+        rows = await this.cleanFields(rows)
         let out = this._processGroupByHeaders(rows);
         for (let i = 0; i < out.length; i++) {
-            this.logger.d(out[i]);
-            promiseArr.push(createHttpTaskWithToken({
+            //this.logger.d(out[i]);
+            promiseArr.push(this.createTask({
                 project: process.env.GOOGLE_CLOUD_PROJECT,
                 location: process.env.GAE_LOCATION,
                 payload: JSON.stringify({
@@ -33,16 +35,21 @@ class Upload extends Servlet {
                     _companyId: this.req.param._companyId,
                     collection: this.req.param.collection
                 }),
-                url: this.req.protocol + "://" + this.req.get('host') + this.saveUrl
+                url: this.req.protocol + "://" + this.req.get('host') + this.saveUrl,
+                relativeUri:this.saveUrl
             }));
         }
         await Promise.all(promiseArr);
         //this.sendAsJson(rows);
         return out;
     }
+    
+    async createTask(data){
+        return createHttpTaskWithToken(data)
+    }
 
     async renameHeaders(rows) {
-        let headersToChange = {xlsHeader: "jsonHeader"};
+        /*let headersToChange = {xlsHeader: "jsonHeader"};
         for (let i = 0; i < rows.length; i++) {
             for (let j in rows[i]) {
                 if (!rows[i].hasOwnProperty(j)) continue;
@@ -52,9 +59,12 @@ class Upload extends Servlet {
                     delete rows[i][j];
                 }
             }
-        }
+        }*/
+        return rows;
     }
-
+    async cleanFields(rows) {
+        return rows;
+    }
     _processGroupByHeaders(rows) {
         let out = [{otherRows: rows}];
         this._groupByHeaders(out);
@@ -126,21 +136,25 @@ async function createHttpTaskWithToken({
                                            location = 'us-central1', // The GCP region of your queue
                                            url = 'https://raport-test.cbn-it.ro/', // The full url path that the request will be sent to
                                            payload = 'Hello, World!', // The task HTTP request body
-                                           inSeconds = 0 // Delay in task execution
+                                           inSeconds = 0, // Delay in task execution
+                                           relativeUri
                                        }) {
 
     const task = {
-        httpRequest: {
+        appEngineHttpRequest: {
             httpMethod: 'POST',
             headers: {
                 "Content-Type": "application/json"
             },
-            url,
+            relativeUri,
+            oidcToken: {
+                serviceAccountEmail:'service-698554348239@gcp-sa-cloudtasks.iam.gserviceaccount.com',
+            },
         },
     };
 
     if (payload) {
-        task.httpRequest.body = Buffer.from(payload);
+        task.appEngineHttpRequest.body = Buffer.from(payload);
     }
 
     if (inSeconds) {
@@ -155,8 +169,6 @@ async function createHttpTaskWithToken({
         task: task,
     };
 
-    console.log('Sending task:');
-    console.log(task);
     // Send create task request.
     const [response] = await client.createTask(request);
     return response

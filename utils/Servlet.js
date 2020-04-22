@@ -22,7 +22,15 @@ const {BigQuery} = require('@google-cloud/bigquery');
  * A database document or null
  * @typedef {null|DatabaseDocument} NullableDatabaseDocument
  */
-
+/**
+ * Logger
+ * @typedef {Object} CBNLogger
+ * @property {Function} d
+ * @property {Function} i
+ * @property {Function} w
+ * @property {Function} s
+ * @property {Function} tag
+ */
 
 /**
  * This is the base class for all the API calls <br />
@@ -55,10 +63,17 @@ class Servlet {
      * @type {Array<String>}
      */
     requiredParams = [];
-
+    /**
+     *
+     * @param {Express.Request} req
+     * @param {Express.Response} res
+     */
     constructor(req, res) {
+        /** @type {Express.Response} */
         this.res = res;
+        /** @type {Express.Request} */
         this.req = req;
+        /** @type {CBNLogger} */
         this.logger = this.req.log;
         this._companyId = this.req.param._companyId;
         this._initializeAppAndDatabase();
@@ -90,6 +105,9 @@ class Servlet {
                 projectId: process.env.GOOGLE_CLOUD_PROJECT
             });
             Servlet._db = admin.firestore();
+            Servlet._bigquery = new BigQuery({});
+        } else if (Servlet._db === undefined) {
+            Servlet._db = admin.apps[0].firestore();
             Servlet._bigquery = new BigQuery({});
         }
     }
