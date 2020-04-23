@@ -121,7 +121,16 @@ class Servlet {
             if (sessionCookie === "") {
                 this._user = null;
             } else {
-                this._user = await admin.auth().verifySessionCookie(sessionCookie);
+                try {
+                    this._user = await admin.auth().verifySessionCookie(sessionCookie);
+                } catch (e) {
+                    this.res.clearCookie('session', {
+                        httpOnly: true,
+                        secure: this.req.protocol === "https",
+                        sameSite: "lax"
+                    });
+                    throw new AuthenticationError(e.message);
+                }
             }
         }
         this.logger.tag("user", this._user ? this._user.email : null);
