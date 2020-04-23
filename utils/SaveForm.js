@@ -96,14 +96,15 @@ class SaveForm extends Servlet {
 
     _processAdress(newData, field, reqData) {
         if (reqData[`${field.name}.id`]) {
-            newData[`${field.name}_label`] = `${reqData[`${field.name}.prescurtare_judet`]}, ${reqData[`${field.name}.nume_superior`]}, ${reqData[`${field.name}.nume_localitate`]}`.trim();
+            newData[`${field.name}_label`] = (reqData[`${field.name}_label`] || "").trim();
             newData[field.name] = {
                 nume_localitate: reqData[`${field.name}.nume_localitate`] || "",
                 nume_superior: reqData[`${field.name}.nume_superior`] || "",
                 nume_judet: reqData[`${field.name}.nume_judet`] || "",
+                prescurtare_judet: reqData[`${field.name}.prescurtare_judet`] || "",
                 id: reqData[`${field.name}.id`] || "",
                 ancestor: reqData[`${field.name}.ancestor`] || "",
-                label: reqData[`${field.name}_label`] || ""
+                label: newData[`${field.name}_label`]
             };
         } else {
             newData[`${field.name}_label`] = '';
@@ -111,6 +112,7 @@ class SaveForm extends Servlet {
                 nume_localitate: '',
                 nume_superior: '',
                 nume_judet: '',
+                prescurtare_judet: '',
                 id: '',
                 ancestor: '',
                 label: ''
