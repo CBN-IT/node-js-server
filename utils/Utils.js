@@ -330,4 +330,4 @@ const _stringify = (data, indent) => {
 
 };
 
-module.exports = {timeout, getCircularReplacer, requestParam, _stringify, redirectToHttps};
+module.exports = {timeout, getCircularReplacer, requestParam, _stringify, redirectToHttps,unflat};
