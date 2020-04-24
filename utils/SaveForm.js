@@ -46,7 +46,7 @@ class SaveForm extends Servlet {
                         newData[field.name] = value;
                         break;
                     case 'boolean':
-                        newData[field.name] = value === 'true';
+                        newData[field.name] = value === 'true' || value === true;
                         break;
                     case 'integer':
                         if (!isNaN(parseInt(value))) {
