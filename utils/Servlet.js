@@ -537,6 +537,7 @@ class Servlet {
      */
     async runQueryNoDeleted(_companyId, collection, conditions = []) {
         let _pathCollection = _companyId === '' || _companyId === 'default' ? collection : `company/${_companyId}/${collection}`;
+        let query = this.db.collection(_pathCollection);
         conditions.forEach(condition => query = query.where(condition[0], condition[1], condition[2]));
         return this.processDocuments(await query.get(), _pathCollection);
     }
