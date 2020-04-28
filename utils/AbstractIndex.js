@@ -39,7 +39,7 @@ class AbstractIndex extends GetConfigs {
             this._redirectWithContinue('/login/company-ban/' + account._companyName);
             return
         }
-        if ((account.blockedAccessCompanyDate || "") !== "" && dayjs().format("YYYY-MM-DD") > account.blockedAccessCompanyDate) {
+        if ((account.blockedAccessCompanyDate || "") !== "" && dayjs().format("YYYY-MM-DD") >= account.blockedAccessCompanyDate) {
             this._redirectWithContinue('/login/company-ban/' + account._companyName);
             return
         }
