@@ -1,6 +1,6 @@
 const SaveForm = require('./SaveForm');
 const SendGrid = require('../mail/SendGridMail.js');
-const moment = require('moment');
+const dayjs = require('dayjs');
 
 /**
  * @abstract
@@ -24,7 +24,7 @@ class SaveHelp extends SaveForm {
     async execute() {
         let newData = {
             ...await this.getUpdatedData(),
-            date: moment().format("YYYY-MM-DD"),
+            date: dayjs().format("YYYY-MM-DD"),
             companyId: this.req.param._companyId
         };
         let response = await this.updateDocument('default', "help", this.req.param._id, newData, false);

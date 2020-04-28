@@ -2,7 +2,7 @@
 const {Storage} = require('@google-cloud/storage');
 const storage = new Storage();
 
-const moment = require("moment");
+const dayjs = require("dayjs");
 const Multer = require('multer');
 const multer = Multer({
     storage: Multer.MemoryStorage,
@@ -22,7 +22,7 @@ function sendUploadToGCS(bucketName) {
         if (!req.files) {
             return next();
         }
-        const today = moment().format("YYYY/MM/DD");
+        const today = dayjs().format("YYYY/MM/DD");
         const prefix = today+"/"+Date.now()+"_";
         let promiseArr = [];
         for (let i = 0; i < req.files.length; i++) {

@@ -2,6 +2,7 @@ const GetConfigs = require('./GetConfigs.js');
 const {_stringify} = require('./Utils.js');
 const fs = require("fs");
 const path = require("path");
+const dayjs = require("dayjs");
 
 /**
  * @abstract
@@ -35,6 +36,10 @@ class AbstractIndex extends GetConfigs {
             return;
         }
         if (account.blockedAccessCompany === true) {
+            this._redirectWithContinue('/login/company-ban/' + account._companyName);
+            return
+        }
+        if ((account.blockedAccessCompanyDate || "") !== "" && dayjs().format("YYYY-MM-DD") > account.blockedAccessCompanyDate) {
             this._redirectWithContinue('/login/company-ban/' + account._companyName);
             return
         }
