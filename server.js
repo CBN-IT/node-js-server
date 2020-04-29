@@ -15,12 +15,12 @@ const PORT = process.env.PORT || 8080;
 const NODE_ENV = process.env.NODE_ENV;
 const BASE = (NODE_ENV === 'development') ? 'build/dev/' : '';
 
-let lastModified = new Date(Number((process.env.GAE_DEPLOYMENT_ID||0)*1/ (2 << 27) * 1000)).toUTCString()
+let lastModified = new Date(Number((process.env.GAE_DEPLOYMENT_ID || 0) * 1 / (2 << 27) * 1000)).toUTCString()
 
 function addStatic(app, map) {
     for (let i in map) {
         if (!map.hasOwnProperty(i)) continue;
-        app.use(i, express.static(map[i],{
+        app.use(i, express.static(map[i], {
             setHeaders: (res, path) => {
                 if (path.endsWith('.js')) {
                     res.setHeader('Last-Modified', lastModified)
@@ -45,7 +45,7 @@ function addMappings(app, arr) {
                 if (!res.headersSent) {
                     if (value !== undefined) {
                         processor.sendAsJson(value);
-                    }else{
+                    } else {
                         throw new Error("The servlet did not return anything and it didn't call sendAsJson");
                     }
                 }
@@ -83,7 +83,9 @@ function addMappings(app, arr) {
 
                     res.status(500);
                 }
-                req.log.d(JSON.parse(JSON.stringify(req.param)));
+                if (process.env.NODE_ENV !== "development") {
+                    req.log.d(JSON.parse(JSON.stringify(req.param)));
+                }
                 res.setHeader('Content-Type', 'application/json; charset=UTF-8');
                 res.send(JSON.stringify(error));
             }

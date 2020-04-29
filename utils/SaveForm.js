@@ -138,14 +138,8 @@ class SaveForm extends Servlet {
         }
 
         //get from file
-        try {
-            let contents = fs.readFileSync(path.join(global.projectRoot, `/server/configs/${collection}.json`), 'utf8');
-            return JSON.parse(contents);
-        } catch (err) {
-            this.logger.w(`No config found for ${collection}`);
-            return null;
-        }
-
+        let contents = fs.readFileSync(path.join(global.projectRoot, `/server/configs/${collection}.json`), 'utf8');
+        return JSON.parse(contents);
     }
 
     setConfig(config) {
