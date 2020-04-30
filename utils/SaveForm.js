@@ -166,7 +166,7 @@ class SaveForm extends Servlet {
         let folderPath = global.projectRoot + `${folderName}`;
         fs.readdirSync(folderPath).forEach(file => {
             if (path.extname(file) === ".json") {
-                configs[path.extname(file).substr(1)] = JSON.parse(fs.readFileSync(`${folderPath}/${file}`, 'utf8'));
+                configs[path.basename(file, path.extname(file))] = JSON.parse(fs.readFileSync(`${folderPath}/${file}`, 'utf8'));
             }
         });
         cache["configs" + folderName] = configs;
