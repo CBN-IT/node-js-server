@@ -141,7 +141,7 @@ class SaveForm extends Servlet {
         }
 
         //get from file
-        return this._getConfig(`/server/configs/`)[collection];
+        return this._getConfigs(`/server/configs/`)[collection];
     }
 
     setConfig(config) {
