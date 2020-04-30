@@ -2,6 +2,9 @@ const path = require('path');
 const fs = require("fs");
 const Servlet = require('./Servlet.js');
 
+const cache = {}
+
+
 /**
  * @abstract
  */
@@ -138,8 +141,7 @@ class SaveForm extends Servlet {
         }
 
         //get from file
-        let contents = fs.readFileSync(path.join(global.projectRoot, `/server/configs/${collection}.json`), 'utf8');
-        return JSON.parse(contents);
+        return this._getConfig(`/server/configs/`)[collection];
     }
 
     setConfig(config) {
@@ -157,13 +159,17 @@ class SaveForm extends Servlet {
     }
 
     _getConfigs(folderName) {
+        if (cache["configs" + folderName]) {
+            return cache["configs" + folderName];
+        }
         let configs = {};
         let folderPath = global.projectRoot + `${folderName}`;
         fs.readdirSync(folderPath).forEach(file => {
-            if (file.split('.')[1] === "json") {
-                configs[file.split('.')[0]] = new Function("return " + fs.readFileSync(`${folderPath}/${file}`, 'utf8'))();
+            if (path.extname(file) === ".json") {
+                configs[path.extname(file).substr(1)] = JSON.parse(fs.readFileSync(`${folderPath}/${file}`, 'utf8'));
             }
         });
+        cache["configs" + folderName] = configs;
         return configs;
     }
 
