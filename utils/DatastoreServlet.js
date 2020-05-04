@@ -1,10 +1,15 @@
 const admin = require('firebase-admin');
 const SaveForm = require("./SaveForm")
+const Servlet = require("./Servlet")
 const {Datastore} = require('@google-cloud/datastore');
 let datastoreTimeout = {
     gaxOptions: {timeout: 5000}
 };
 
+/**
+ * @abstract
+ * @type {DatastoreServlet}
+ */
 module.exports = class DatastoreServlet extends SaveForm{
 
 
@@ -16,6 +21,9 @@ module.exports = class DatastoreServlet extends SaveForm{
         return Servlet._db;
     }
 
+    get datastore() {
+        return Servlet._datastore;
+    }
     /**
      *
      * @type {BigQuery}
@@ -28,7 +36,7 @@ module.exports = class DatastoreServlet extends SaveForm{
      * @private
      */
     _initializeAppAndDatabase() {
-        Servlet._db = new Datastore({projectId: process.env.GOOGLE_CLOUD_PROJECT});
+        Servlet._datastore = new Datastore({projectId: process.env.GOOGLE_CLOUD_PROJECT});
     }
 
 
@@ -46,10 +54,10 @@ module.exports = class DatastoreServlet extends SaveForm{
 
     async runQuery(_companyId, collection, conditions = []) {
         _companyId = _companyId === "" || _companyId==="default"?"":_companyId;
-        let query = this.db.createQuery(_companyId,collection);
+        let query = this.datastore.createQuery(_companyId,collection);
         conditions.forEach(condition => query = query.filter(...condition));
 
-        let [data] = await this.db.runQuery(query, datastoreTimeout);
+        let [data] = await this.datastore.runQuery(query, datastoreTimeout);
 
         return data;
     }
