@@ -104,7 +104,7 @@ function startApp() {
     app.use(cookieParser());
     app.use(logginMiddleware());
     app.use(bodyParser.json({limit: "50mb"}));
-    app.use(bodyParser.urlencoded({extended: false, limit: "50mb"}));
+    app.use(bodyParser.urlencoded({extended: false, limit: "50mb", parameterLimit:10000}));
 
     app.use(multer.any());
     app.use(requestParam);
