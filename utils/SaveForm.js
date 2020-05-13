@@ -159,7 +159,7 @@ class SaveForm extends Servlet {
     }
 
     _getConfigs(folderName) {
-        if (cache["configs" + folderName]) {
+        if (cache["configs" + folderName] && Object.keys(cache["configs" + folderName]) > 0) {
             return cache["configs" + folderName];
         }
         let configs = {};
