@@ -469,6 +469,9 @@ class Servlet {
      * @returns {Promise<NullableDatabaseDocument>}
      */
     async getDocument(_companyId, collection, _id) {
+        if (_id === null || _id === undefined || _id === "") {
+            return null;
+        }
         let _pathCollection = _companyId !== 'default' && _companyId !== '' ? `company/${_companyId}/${collection}` : collection;
         return this.getDocumentByPath(`${_pathCollection}/${_id}`)
     }
@@ -490,10 +493,11 @@ class Servlet {
      *
      * @param _companyId
      * @param collection
-     * @param _ids
+     * @param {String[]} _ids
      * @returns {Promise<DatabaseDocument[]>}
      */
     async getDocuments(_companyId, collection, _ids) {
+        _ids = _ids.filter(id => id !== null && id !== undefined && id !== "");
         let _pathCollection = _companyId === '' || _companyId === 'default' ? collection : `company/${_companyId}/${collection}`;
         let _paths = _ids.map(_id => `${_pathCollection}/${_id}`)
         return this.getDocumentsByPath(_paths);
@@ -501,7 +505,7 @@ class Servlet {
 
     /**
      *
-     * @param _paths
+     * @param {String[]} _paths
      * @returns {Promise<DatabaseDocument[]>}
      */
     async getDocumentsByPath(_paths) {
