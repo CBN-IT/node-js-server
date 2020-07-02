@@ -4,24 +4,24 @@
   "description": "Node JS Server",
   "main": "server.js",
   "dependencies": {
-    "@google-cloud/bigquery": "4.7.0",
+    "@google-cloud/bigquery": "5.0.0",
     "@google-cloud/datastore": "6.0.0",
-    "@google-cloud/storage": "5.1.0",
-    "@google-cloud/tasks": "2.0.0",
-    "@google-cloud/trace-agent": "5.0.0",
-    "@sendgrid/mail": "7.2.0",
+    "@google-cloud/storage": "5.1.1",
+    "@google-cloud/tasks": "2.0.1",
+    "@google-cloud/trace-agent": "5.1.0",
+    "@sendgrid/mail": "7.2.1",
     "body-parser": "1.19.0",
     "cookie-parser": "1.4.5",
     "express": "4.17.1",
-    "firebase-admin": "8.12.1",
+    "firebase-admin": "8.13.0",
     "logging-js": "git+https://bitbucket.org/cbn-it/logging-js.git",
     "dayjs": "1.8.28",
     "multer": "1.4.2",
     "nanoid": "3.1.10",
-    "xlsx": "0.16.2"
+    "xlsx": "0.16.3"
   },
   "scripts": {
-    "symlink-logger": "mklink /D \"node_modules\\logging-js\" \"..\\..\\logging-js\""
+    "symlink-logger": "npm link logging-js"
   },
   "repository": {
     "type": "git",
