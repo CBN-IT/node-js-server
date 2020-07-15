@@ -55,7 +55,7 @@ function addMappings(app, arr) {
                     res.status(408);
                 } else if (error instanceof AuthenticationError) {
                     req.log.i(error);
-                    if (req.xhr) {
+                    if (req.xhr || req.headers.accept.includes('json')) {
                         res.status(401);
                     } else {
                         res.redirect('/login');
@@ -63,7 +63,7 @@ function addMappings(app, arr) {
                     }
                 } else if (error instanceof AuthorizationError) {
                     req.log.w(error);
-                    if (req.xhr) {
+                    if (req.xhr || req.headers.accept.includes('json')) {
                         res.status(403);
                     } else {
                         res.redirect('/logout/unauthorized');
