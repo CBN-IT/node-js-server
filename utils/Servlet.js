@@ -279,6 +279,10 @@ class Servlet {
      * @param {Array|Object|String} str
      */
     sendAsJson(str) {
+        if(this.req.get('origin')){
+            this.res.setHeader('Access-Control-Allow-Origin', this.req.get('origin'))
+            this.res.setHeader('Access-Control-Allow-Credentials', "true")
+        }
         this.res.setHeader('Content-Type', 'application/json; charset=UTF-8');
         if (typeof str === "string") {
             this.res.send(str);

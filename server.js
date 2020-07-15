@@ -86,8 +86,7 @@ function addMappings(app, arr) {
                 if (process.env.NODE_ENV !== "development") {
                     req.log.d(JSON.parse(JSON.stringify(req.param)));
                 }
-                res.setHeader('Content-Type', 'application/json; charset=UTF-8');
-                res.send(JSON.stringify(error));
+                processor.sendAsJson(JSON.stringify(error));
             }
         });
     });
