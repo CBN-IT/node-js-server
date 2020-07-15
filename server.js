@@ -64,7 +64,7 @@ function addMappings(app, arr) {
                 } else if (error instanceof AuthorizationError) {
                     req.log.w(error);
                     if (req.xhr) {
-                        res.status(401);
+                        res.status(403);
                     } else {
                         res.redirect('/logout/unauthorized');
                         return;
