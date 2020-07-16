@@ -55,7 +55,8 @@ module.exports = class DatastoreServlet extends SaveForm{
     async runQuery(_companyId, collection, conditions = []) {
         _companyId = _companyId === "" || _companyId==="default"?"":_companyId;
         let query = this.datastore.createQuery(_companyId,collection);
-        conditions.forEach(condition => query = query.filter(...condition));
+        console.log(conditions);
+        conditions.forEach(condition => query = query.filter(condition[0], (condition[1]==="=="?"=":condition[1]), condition[2]));
 
         let [data] = await this.datastore.runQuery(query, datastoreTimeout);
 

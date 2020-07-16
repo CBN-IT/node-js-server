@@ -203,13 +203,13 @@ class Servlet {
             if (user == null) {
                 this._account = null;
             } else if (this._isAdmin(user)) {
-                this._account = this._getSuperAdminCont(user, _companyId);
+                this._account = this._getSuperAdminCont({...user}, _companyId);
             } else {
                 let accounts = await this.runQuery('', 'account', [['accountEmail', '==', user.email]]);
                 if (_companyId) {
                     for (let i = 0; i < accounts.length; i++) {
                         if (accounts[i].accountType === "SuperAdmin") {
-                            this._account = this._getSuperAdminCont(user, _companyId);
+                            this._account = this._getSuperAdminCont({...user}, _companyId);
                             return this._account;
                         } else if (accounts[i]._companyId === _companyId) {
                             this._account = accounts[i];
@@ -233,7 +233,7 @@ class Servlet {
     _isAdmin(user) {
         return user !== null && (
             user.email === 'octavianvoloaca@gmail.com' ||
-            user.email === 'bogdan.nourescu@cbn-it.ro'
+            user.email === ''
         );
     }
 

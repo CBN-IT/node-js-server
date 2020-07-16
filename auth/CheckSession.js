@@ -1,11 +1,16 @@
 const Servlet = require('./../utils/Servlet');
+const {AuthenticationError} = require("../utils/errors");
 
 class CheckSession extends Servlet {
     static url = ["/auth/checkSession"];
-    requiredLogin = true;
+    requiredLogin = false;
 
     async execute() {
-        return this.getUser();
+        let user = await this.getUser();
+        if(user===null){
+            throw new AuthenticationError("No user")
+        }
+        return user;
     }
 }
 
