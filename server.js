@@ -2,6 +2,7 @@ const {TimeoutError, AuthorizationError, AuthenticationError, ValidationError, R
 
 const express = require('express');
 const path = require("path");
+const cors = require('cors');
 const bodyParser = require("body-parser");
 const {requestParam, timeout, redirectToHttps} = require('./utils/Utils');
 const {logginMiddleware} = require('logging-js');
@@ -101,6 +102,12 @@ function startApp() {
     });
     app.use(redirectToHttps);
     app.use(cookieParser());
+    if (process.env.NODE_ENV === "development") {
+        app.options('*', cors({
+            origin: true,
+            credentials: true,
+        }));
+    }
     app.use(logginMiddleware());
     app.use(bodyParser.json({limit: "50mb"}));
     app.use(bodyParser.urlencoded({extended: false, limit: "50mb", parameterLimit:10000}));

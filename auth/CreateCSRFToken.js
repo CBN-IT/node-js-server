@@ -1,7 +1,7 @@
 const Servlet = require('./../utils/Servlet');
 const {nanoid} = require('nanoid');
 
-class CreateSession extends Servlet {
+class CreateCSRFToken extends Servlet {
     static url = '/auth/csrf';
     requiredLogin = false;
 
@@ -18,4 +18,5 @@ class CreateSession extends Servlet {
     }
 }
 
-module.exports = CreateSession;
+module.exports = CreateCSRFToken;
+

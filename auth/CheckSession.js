@@ -1,7 +1,7 @@
 const Servlet = require('./../utils/Servlet');
 
-class CreateSession extends Servlet {
-    static url =["/auth/checkSession"];
+class CheckSession extends Servlet {
+    static url = ["/auth/checkSession"];
     requiredLogin = true;
 
     async execute() {
@@ -9,4 +9,4 @@ class CreateSession extends Servlet {
     }
 }
 
-module.exports = CreateSession;
+module.exports = CheckSession;
