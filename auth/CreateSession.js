@@ -3,8 +3,7 @@ const admin = require('firebase-admin');
 const {AuthenticationError} = require("../utils/errors");
 
 class CreateSession extends Servlet {
-    static url = '/CreateSession';
-
+    static url =['/CreateSession',"/auth/createSession"];
     requiredLogin = false;
     requiredParams = ["csrfToken", "idToken"];
 
@@ -30,8 +29,8 @@ class CreateSession extends Servlet {
             sameSite: "lax"
         };
         this.res.cookie('session', sessionCookie, options);
-        this.res.clearCookie('csrfToken', options);
-        return {status: 'success'};
+        //this.res.clearCookie('csrfToken', options);
+        return admin.auth().verifySessionCookie(sessionCookie);
     }
 }
 

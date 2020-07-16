@@ -279,7 +279,7 @@ class Servlet {
      * @param {Array|Object|String} str
      */
     sendAsJson(str) {
-        if(this.req.get('origin')){
+        if(this.req.get('origin') && process.env.NODE_ENV === "development"){
             this.res.setHeader('Access-Control-Allow-Origin', this.req.get('origin'))
             this.res.setHeader('Access-Control-Allow-Credentials', "true")
         }
