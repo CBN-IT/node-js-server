@@ -41,7 +41,7 @@ function addMappings(app, arr) {
                 await processor.validate();
                 let value = await Promise.race([
                     processor.execute(),
-                    timeout(55)
+                    timeout(servlet.timeout || 55)
                 ]);
                 if (!res.headersSent) {
                     if (value !== undefined) {
