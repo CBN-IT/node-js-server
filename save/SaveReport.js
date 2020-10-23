@@ -10,6 +10,7 @@ class SaveReport extends Servlet {
         let importTemplates =this.req.param['importTemplates'] ? this.req.param['importTemplates'] instanceof Array ? this.req.param['importTemplates'] : [this.req.param['importTemplates']] : [];
         let newData = {
             'reportName': this.req.param['reportName'],
+            'groupName': this.req.param['groupName']||"",
             'type': this.req.param['type'],
             'generator': this.req.param['generator'],
             'collection': this.req.param['collection'],
