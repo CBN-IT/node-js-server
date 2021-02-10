@@ -36,6 +36,11 @@ module.exports = class DatastoreServlet extends SaveForm{
      * @private
      */
     _initializeAppAndDatabase() {
+        if (admin.apps.length === 0) {
+            admin.initializeApp({
+                projectId: process.env.GOOGLE_CLOUD_PROJECT
+            });
+        }
         Servlet._datastore = new Datastore({projectId: process.env.GOOGLE_CLOUD_PROJECT});
     }
 
