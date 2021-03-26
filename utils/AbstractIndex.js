@@ -56,8 +56,7 @@ class AbstractIndex extends GetConfigs {
         let columns = await this._getForms('server/columns', 'column', _companyId, true);
         let reports = await this._getReports('report', _companyId, true);
         let user = await this.getUser();
-
-        return Object.assign({
+        let response = {
             _appId: process.env.GOOGLE_CLOUD_PROJECT,
             NODE_ENV: process.env.NODE_ENV,
             _configs: forms,
@@ -66,7 +65,8 @@ class AbstractIndex extends GetConfigs {
             _companies: companies,
             _selectedCompany: _companyId,
             _user: user
-        }, await this.getData(_companyId,companies,user));
+        };
+        return Object.assign(response, await this.getData(_companyId,response));
     }
 
     /**
