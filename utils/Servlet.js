@@ -528,26 +528,38 @@ class Servlet {
      * @param _companyId
      * @param collection
      * @param conditions
+     * @param fields
      * @returns {Promise<DatabaseDocument[]>}
      */
-    async runQuery(_companyId, collection, conditions = []) {
+    async runQuery(_companyId, collection, conditions = [], fields=[]) {
         let _pathCollection = _companyId === '' || _companyId === 'default' ? collection : `company/${_companyId}/${collection}`;
         let query = this.db.collection(_pathCollection).where('_deleted', '==', null);
-        conditions.forEach(condition => query = query.where(condition[0], condition[1], condition[2]));
-        return this.processDocuments(await query.get(), _pathCollection);
+        for (let condition of conditions) {
+            query = query.where(condition[0], condition[1], condition[2])
+        }
+        if (fields && fields.length) {
+            query = query.select(...fields)
+        }
+        return this.processDocuments(await query.get());
     }
     /**
      *
      * @param _companyId
      * @param collection
      * @param conditions
+     * @param fields
      * @returns {Promise<DatabaseDocument[]>}
      */
-    async runQueryNoDeleted(_companyId, collection, conditions = []) {
+    async runQueryNoDeleted(_companyId, collection, conditions = [], fields=[]) {
         let _pathCollection = _companyId === '' || _companyId === 'default' ? collection : `company/${_companyId}/${collection}`;
         let query = this.db.collection(_pathCollection);
-        conditions.forEach(condition => query = query.where(condition[0], condition[1], condition[2]));
-        return this.processDocuments(await query.get(), _pathCollection);
+        for (let condition of conditions) {
+            query = query.where(condition[0], condition[1], condition[2])
+        }
+        if (fields && fields.length) {
+            query = query.select(...fields)
+        }
+        return this.processDocuments(await query.get());
     }
 }
 
