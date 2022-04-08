@@ -20,6 +20,12 @@ class CreateSession extends Servlet {
         // The session cookie will have the same claims as the ID token.
         // To only allow session cookie setting on recent sign-in, auth_time in ID token
         // can be checked to ensure user was recently signed in before creating a session cookie.
+        if (admin.apps.length === 0) {
+            admin.initializeApp({
+                projectId: process.env.GOOGLE_CLOUD_PROJECT
+            });
+        }
+
         let sessionCookie = await admin.auth().createSessionCookie(this.req.param.idToken, {expiresIn});
         // Set cookie policy for session cookie.
         const options = {
