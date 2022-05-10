@@ -5,7 +5,7 @@ class SaveDocument extends SaveForm {
     static url = '/SaveDocument';
 
     async execute(){
-        return await this.save();
+        return await this.saveWithMerge();
     }
 
 }

@@ -8,7 +8,7 @@ class SaveCompany extends SaveForm {
         this.req.param['_companyId'] = 'default';
         this.req.param['collection'] = 'company';
         let oldCompany = this.getDocument('', 'company', this.req.param._id);
-        let newCompany = await this.save();
+        let newCompany = await this.saveWithMerge();
         await this.updateAccounts(oldCompany, newCompany);
         return newCompany;
 
