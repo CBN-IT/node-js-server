@@ -18,19 +18,18 @@ const getCircularReplacer = () => {
     };
 };
 const redirectToHttps = (req, res, next) => {
-    let url = new URL(req.protocol + "://" + req.headers.host);
-    if (req.protocol !== 'http' ||
-        req.headers.host.indexOf('localhost') > -1 ||
-        url.hostname.split(".").length >= 4 ||
+    let hostname = req.hostname;
+    let appspotReg = /([^.]+).([^.]+).((ew.r.)?appspot.com)/g;
+
+    if (req.protocol === 'https' ||
         req.headers["x-appengine-cron"] !== undefined ||
-        req.hostname.contains(".ew.r.appspot.com")
-    ) {
-        // appengine subdomain doesn't allow https on second level subdomain
-        // request was via https, so do no special handling
+        req.headers.host.includes('localhost')) {
+
         next();
+    } else if (appspotReg.test(hostname)) {
+        res.redirect('https://' + hostname.replace(appspotReg, "$1-dot-$2.$3") + req.originalUrl);
     } else {
-        // request was via http, so redirect to https
-        res.redirect('https://' + req.headers.host + req.url);
+        res.redirect('https://' + hostname + req.originalUrl);
     }
 };
 
