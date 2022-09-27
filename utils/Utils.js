@@ -22,7 +22,8 @@ const redirectToHttps = (req, res, next) => {
     if (req.protocol !== 'http' ||
         req.headers.host.indexOf('localhost') > -1 ||
         url.hostname.split(".").length >= 4 ||
-        req.headers["x-appengine-cron"] !== undefined
+        req.headers["x-appengine-cron"] !== undefined ||
+        req.hostname.contains(".ew.r.appspot.com")
     ) {
         // appengine subdomain doesn't allow https on second level subdomain
         // request was via https, so do no special handling
