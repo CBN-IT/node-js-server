@@ -19,7 +19,7 @@ const getCircularReplacer = () => {
 };
 const redirectToHttps = (req, res, next) => {
     let hostname = req.hostname;
-    let appspotReg = /([^.]+).([^.]+).((ew.r.)?appspot.com)/g;
+    let appspotReg = /^([^.]+)\.([^.]+)\.((ew\.r\.)?appspot\.com)$/g;
 
     if (req.protocol === 'https' ||
         req.headers["x-appengine-cron"] !== undefined ||
