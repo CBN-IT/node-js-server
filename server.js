@@ -59,7 +59,7 @@ function addMappings(app, arr) {
                     if (req.xhr || req.headers.accept.includes('json')) {
                         res.status(401);
                     } else {
-                        res.redirect('/login?continue='+req.originalUrl);
+                        res.redirect('/login?continue='+encodeURI(req.originalUrl));
                         return;
                     }
                 } else if (error instanceof AuthorizationError) {
