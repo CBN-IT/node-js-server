@@ -28,7 +28,6 @@ async function processRO(tari, locSuperior, locInferior, judete, judetePrescurta
 
     localitati = localitati.map(value => {
         if (value.rank === 1) {
-            console.log(value);
             return {
                 nume_localitate: "",
                 nume_superior: value.name,
