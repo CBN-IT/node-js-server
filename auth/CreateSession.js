@@ -1,5 +1,6 @@
 const Servlet = require('./../utils/Servlet');
-const admin = require('firebase-admin');
+const {getApps, initializeApp } = require('firebase-admin/app');
+const {getAuth } = require('firebase-admin/auth');
 const {AuthenticationError} = require("../utils/errors");
 
 class CreateSession extends Servlet {
@@ -20,16 +21,16 @@ class CreateSession extends Servlet {
         // The session cookie will have the same claims as the ID token.
         // To only allow session cookie setting on recent sign-in, auth_time in ID token
         // can be checked to ensure user was recently signed in before creating a session cookie.
-        if (!admin.apps.some((app)=>{
+        if (!getApps().some((app) => {
             this.logger.d(app.name)
-            return app.name==="[DEFAULT]"
+            return app.name === "[DEFAULT]"
         })) {
-            admin.initializeApp({
+            initializeApp({
                 projectId: process.env.GOOGLE_CLOUD_PROJECT
             });
         }
 
-        let sessionCookie = await admin.auth().createSessionCookie(this.req.param.idToken, {expiresIn});
+        let sessionCookie = await getAuth().createSessionCookie(this.req.param.idToken, {expiresIn});
         // Set cookie policy for session cookie.
         const options = {
             maxAge: expiresIn,
@@ -39,7 +40,7 @@ class CreateSession extends Servlet {
         };
         this.res.cookie('session', sessionCookie, options);
         //this.res.clearCookie('csrfToken', options);
-        return admin.auth().verifySessionCookie(sessionCookie);
+        return getAuth().verifySessionCookie(sessionCookie);
     }
 }
 

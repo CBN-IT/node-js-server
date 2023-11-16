@@ -1,7 +1,9 @@
 const {AuthenticationError, AuthorizationError, RequiredFieldError, ValidationError} = require("./errors");
 const {getCircularReplacer} = require('./Utils');
-const admin = require('firebase-admin');
+const {getApps, initializeApp} = require('firebase-admin/app');
+const {getFirestore} = require('firebase-admin/firestore');
 const {BigQuery} = require('@google-cloud/bigquery');
+const {getAuth} = require("firebase-admin/auth");
 
 /**
  * A database document
@@ -100,14 +102,14 @@ class Servlet {
      * @private
      */
     _initializeAppAndDatabase() {
-        if (admin.apps.length === 0) {
-            admin.initializeApp({
+        if (getApps().length === 0) {
+            initializeApp({
                 projectId: process.env.GOOGLE_CLOUD_PROJECT
             });
-            Servlet._db = admin.firestore();
+            Servlet._db = getFirestore();
             Servlet._bigquery = new BigQuery({});
         } else if (Servlet._db === undefined) {
-            Servlet._db = admin.apps[0].firestore();
+            Servlet._db = getFirestore(getApps()[0]);
             Servlet._bigquery = new BigQuery({});
         }
     }
@@ -122,7 +124,7 @@ class Servlet {
                 this._user = null;
             } else {
                 try {
-                    this._user = await admin.auth().verifySessionCookie(sessionCookie);
+                    this._user = await getAuth().verifySessionCookie(sessionCookie);
                 } catch (e) {
                     this.res.clearCookie('session', {
                         httpOnly: true,

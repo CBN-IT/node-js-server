@@ -1,5 +1,5 @@
 const Servlet = require('./../utils/Servlet');
-const admin = require('firebase-admin');
+const {getAuth } = require('firebase-admin/auth');
 
 
 class Logout extends Servlet {
@@ -7,8 +7,7 @@ class Logout extends Servlet {
     requiredLogin = false;
 
     async execute() {
-        let user = await this.getUser();
-        console.log(user);
+        const sessionCookie = req.cookies.session || '';
 
         const options = {
             httpOnly: true,
@@ -16,6 +15,15 @@ class Logout extends Servlet {
             sameSite: "lax"
         };
         this.res.clearCookie('session', options);
+
+        getAuth()
+            .verifySessionCookie(sessionCookie)
+            .then((decodedClaims) => {
+                return getAuth().revokeRefreshTokens(decodedClaims.sub);
+            })
+            .catch((error) => {
+            });
+
         return true;
     }
 }
