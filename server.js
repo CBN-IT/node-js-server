@@ -113,8 +113,8 @@ function startApp() {
     app.use(bodyParser.urlencoded({extended: false, limit: "50mb", parameterLimit:50000}));
 
     app.use(multer.any());
-    app.use(requestParam);
     app.use(sendUploadToGCS(`${process.env.GOOGLE_CLOUD_PROJECT}.appspot.com`));
+    app.use(requestParam);
 
     app.listen(PORT, () => {
         console.log(`Server listening on port ${PORT}...`);
