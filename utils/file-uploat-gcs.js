@@ -4,6 +4,7 @@ const storage = new Storage();
 
 const dayjs = require("dayjs");
 const Multer = require('multer');
+const {unflat} = require("./Utils");
 const multer = Multer({
     storage: Multer.MemoryStorage,
     limits: {
@@ -22,6 +23,7 @@ function sendUploadToGCS(bucketName) {
         if (!req.files) {
             return next();
         }
+        unflat(req.body);
         const today = dayjs().format("YYYY/MM/DD");
         const prefix = today+"/"+Date.now()+"_";
         let promiseArr = [];
