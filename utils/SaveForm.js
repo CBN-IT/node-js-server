@@ -67,6 +67,12 @@ class SaveForm extends Servlet {
                     case 'file':
                         newData[field.name] = value;
                         newData[field.name + "_urls"] = this._getValue(field.multiple, reqData[field.name + "_urls"], field.type);
+                        if (newData[field.name + "_urls"] === undefined) {
+                            newData[field.name + "_urls"] = field.multiple ? [] : "";
+                        }
+                        if (value instanceof Array) {
+                            newData[field.name + "_urls"].length = value.length
+                        }
                         break;
                 }
             }
