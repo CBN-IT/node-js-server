@@ -23,6 +23,7 @@ const redirectToHttps = (req, res, next) => {
 
     if (req.protocol === 'https' ||
         req.headers["x-appengine-cron"] !== undefined ||
+        req.headers["x-appengine-taskname"] !== undefined ||
         req.headers.host.includes('localhost')) {
 
         next();
