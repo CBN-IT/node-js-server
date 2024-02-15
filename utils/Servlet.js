@@ -104,6 +104,9 @@ class Servlet {
             admin.initializeApp({
                 projectId: process.env.GOOGLE_CLOUD_PROJECT
             });
+            // admin.firestore().settings({
+            //     ignoreUndefinedProperties: true,
+            // })
             Servlet._db = admin.firestore();
             Servlet._bigquery = new BigQuery({});
         } else if (Servlet._db === undefined) {

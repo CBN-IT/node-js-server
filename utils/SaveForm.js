@@ -46,7 +46,7 @@ class SaveForm extends Servlet {
             if (value !== undefined) {
                 switch (field['dbType']) {
                     case 'string':
-                        newData[field.name] = value;
+                        newData[field.name] = (value + "").trim();
                         break;
                     case 'boolean':
                         newData[field.name] = value === 'true' || value === true;
@@ -66,12 +66,10 @@ class SaveForm extends Servlet {
                         break;
                     case 'file':
                         newData[field.name] = value;
-                        newData[field.name + "_urls"] = this._getValue(field.multiple, reqData[field.name + "_urls"], field.type);
-                        if (newData[field.name + "_urls"] === undefined) {
-                            newData[field.name + "_urls"] = field.multiple ? [] : "";
-                        }
-                        if (value instanceof Array) {
-                            newData[field.name + "_urls"].length = value.length
+                        if (field.multiple) {
+                            newData[field.name + "_urls"] = value.map(v => v.url);
+                        } else {
+                            newData[field.name + "_urls"] = value.url;
                         }
                         break;
                 }
