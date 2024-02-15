@@ -46,7 +46,11 @@ class SaveForm extends Servlet {
             if (value !== undefined) {
                 switch (field['dbType']) {
                     case 'string':
-                        newData[field.name] = (value + "").trim();
+                        if (field.multiple) {
+                            newData[field.name] = value.map(v => (v + "").trim());
+                        } else {
+                            newData[field.name] = (value + "").trim();
+                        }
                         break;
                     case 'boolean':
                         newData[field.name] = value === 'true' || value === true;
