@@ -93,7 +93,7 @@ function addMappings(app, arr) {
     });
 }
 
-function startApp() {
+function startAppAndServer(){
     const app = express();
     app.set('trust proxy', true);
     app.use('/robots.txt', function (req, res) {
@@ -116,7 +116,7 @@ function startApp() {
     app.use(sendUploadToGCS(`${process.env.GOOGLE_CLOUD_PROJECT}.appspot.com`));
     app.use(requestParam);
 
-    app.listen(PORT, () => {
+    let server = app.listen(PORT, () => {
         console.log(`Server listening on port ${PORT}...`);
     });
     addMappings(app, [
@@ -124,6 +124,11 @@ function startApp() {
         path.join(__dirname, "./get"),
         path.join(__dirname, "./save")
     ]);
+    return {app, server};
+}
+
+function startApp() {
+    let {app} = startAppAndServer()
     return app;
 }
 
@@ -131,5 +136,6 @@ module.exports = {
     addMappings,
     BASE,
     addStatic,
-    startApp
+    startApp,
+    startAppAndServer
 };
