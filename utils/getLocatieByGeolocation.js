@@ -131,6 +131,11 @@ async function getLocalitateByGeolocation(lat, long) {
     let locSuperior = Array.from(locSuperiorSet);
     let judetePrescurtare = Array.from(judetePrescurtareSet);
     let locInferior = Array.from(locInferiorSet);
+
+    if (locInferior.length === 0 && locSuperior.length > 0) {
+        locInferior = [...locSuperior];
+    }
+
     if (tari[0] === "RO") {
         const __ret = await processRO(tari, locSuperior, locInferior, judete, judetePrescurtare, tara, nume_judet, nume_superior, nume_localitate, prescurtare_judet);
         tara = __ret.tara;
