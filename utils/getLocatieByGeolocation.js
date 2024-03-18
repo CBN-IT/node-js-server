@@ -74,6 +74,20 @@ async function processRO(tari, locSuperior, locInferior, judete, judetePrescurta
         nume_superior = localitati[0].nume_superior;
         nume_localitate = localitati[0].nume_localitate;
         prescurtare_judet = localitati[0].prescurtare_judet;
+    } else {
+        tara = tari[0];
+        if (judete.length > 0) {
+            nume_judet = judete[0];
+        }
+        if (judetePrescurtare.length > 0) {
+            prescurtare_judet = judetePrescurtare[0];
+        }
+        if (locSuperior.length > 0) {
+            nume_superior = locSuperior[0];
+        }
+        if (locInferior.length > 0) {
+            nume_localitate = locInferior[0];
+        }
     }
     return {tara, nume_judet, nume_superior, nume_localitate, prescurtare_judet};
 }
@@ -103,7 +117,6 @@ async function getLocalitateByGeolocation(lat, long) {
     let judeteSet = new Set();
     let judetePrescurtareSet = new Set();
     let locSuperiorSet = new Set();
-    let locSuperiorPrescurtareSet = new Set();
     let locInferiorSet = new Set();
     if (results !== null && results !== undefined) {
         for (let {address_components} of results) {
@@ -117,7 +130,6 @@ async function getLocalitateByGeolocation(lat, long) {
                 }
                 if (types[0] === "administrative_area_level_2") {
                     locSuperiorSet.add(long_name.replace(/Orașul/g, "").trim());
-                    locSuperiorPrescurtareSet.add(short_name.replace(/Orașul/g, "").trim());
                 }
                 if (types[0] === "locality") {
                     locInferiorSet.add(long_name);
@@ -126,6 +138,7 @@ async function getLocalitateByGeolocation(lat, long) {
             }
         }
     }
+
     let tari = Array.from(tariSet);
     let judete = Array.from(judeteSet);
     let locSuperior = Array.from(locSuperiorSet);
