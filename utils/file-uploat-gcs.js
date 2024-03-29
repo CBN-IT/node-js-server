@@ -8,7 +8,7 @@ const {unflat} = require("./Utils");
 const multer = Multer({
     storage: Multer.MemoryStorage,
     limits: {
-        fileSize: 15 * 1024 * 1024 // no larger than 5mb
+        fileSize: 15 * 1024 * 1024 // no larger than 15mb
     }
 });
 
@@ -48,25 +48,41 @@ function sendUploadToGCS(bucketName) {
                 type: req.files[i].mimetype,
                 url:publicUrl
             };
-            if (req.body[fieldName] === undefined) {
 
-                req.body[fieldName] = [fileObj];
-                req.body[fieldName+"_urls"] = [publicUrl];
+            let body = req.body;
 
-            } else if (req.body[fieldName] instanceof Array) {
-                req.body[fieldName + "_urls"] = [];
-                for (let j = 0; j < req.body[fieldName].length; j++) {
-                    if (typeof req.body[fieldName][j] === "string") {
-                        req.body[fieldName][j] = JSON.parse(req.body[fieldName][j]);
-                    }
-                    req.body[fieldName + "_urls"].push(req.body[fieldName][j].url);
+            if (fieldName.match(/^([^.]+)\.([0-9]+)\.([^.]+)$/)) {
+                let [n, idx, prop] = fieldName.split(".");
+                if (!(body[n] instanceof Array)) {
+                    body[n] = [];
                 }
-                req.body[fieldName].push(fileObj);
-                req.body[fieldName+"_urls"].push(publicUrl);
+                if (!body[n][idx]) {
+                    body[n][idx] = {};
+                }
+                body = body[n][idx];
+                fieldName = prop;
+
+            }
+            if (body[fieldName] === undefined) {
+
+                body[fieldName] = [fileObj];
+                body[fieldName + "_urls"] = [publicUrl];
+
+            } else if (body[fieldName] instanceof Array) {
+                body[fieldName + "_urls"] = [];
+                for (let j = 0; j < body[fieldName].length; j++) {
+                    if (typeof body[fieldName][j] === "string") {
+                        body[fieldName][j] = JSON.parse(body[fieldName][j]);
+                    }
+                    body[fieldName + "_urls"].push(body[fieldName][j].url);
+                }
+
+                body[fieldName].push(fileObj);
+                body[fieldName + "_urls"].push(publicUrl);
             } else {
 
-                req.body[fieldName] = [req.body[fieldName], fileObj];
-                req.body[fieldName+"_urls"] = [req.body[fieldName+"_urls"], publicUrl];
+                body[fieldName] = [body[fieldName], fileObj];
+                body[fieldName + "_urls"] = [body[fieldName + "_urls"], publicUrl];
             }
         }
         await Promise.all(promiseArr);
@@ -78,6 +94,3 @@ module.exports = {
     sendUploadToGCS,
     multer
 };
-
-
-
