@@ -3,10 +3,7 @@ const SaveForm = require('./../utils/SaveForm.js');
 class SaveAccount extends SaveForm {
 
     static url = '/SaveAccount';
-    get requiredUserType(){
-        return ["Admin"];
-    }
-
+    requiredUserType = ["Admin"];
     requiredLogin = true;
 
     async execute(){

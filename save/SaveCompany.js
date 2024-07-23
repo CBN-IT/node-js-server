@@ -1,8 +1,9 @@
 const SaveForm = require('./../utils/SaveForm.js');
 
 class SaveCompany extends SaveForm {
-
     static url = '/SaveCompany';
+    requiredUserType = ["Admin"];
+    requiredLogin = true;
 
     async execute() {
         this.req.param['_companyId'] = 'default';
