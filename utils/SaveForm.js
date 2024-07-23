@@ -78,8 +78,8 @@ class SaveForm extends Servlet {
                         break;
                 }
             }
-            if (field.type === 'select' && field['saveLabel'] && reqData[`${field.name}_label`]) {
-                newData[`${field.name}_label`] = reqData[`${field.name}_label`];
+            if (field.type === 'select' && field['saveLabel']) {
+                newData[`${field.name}_label`] = this._getValue(field.multiple, reqData[`${field.name}_label`], field.type);
             }
         });
         if (config.label) {

@@ -371,9 +371,14 @@ class Servlet {
         let _path = _companyId !== 'default' && _companyId !== '' ? `company/${_companyId}/${collection}` : collection;
         newData._pathCollection = _path;
         let doc = _id ? await this.db.collection(_path).doc(_id).set(newData, {merge: !!merge}) : await this.db.collection(_path).add(newData);
-        let savedData = _id ? {_id: _id, _path: `${_path}/${_id}`, ...newData} : {
+        let savedData = _id ? {
+            _id: _id,
+            _path: `${_path}/${_id}`,
+            ...newData
+        } : {
             _id: doc.id,
-            _path: doc.path, ...newData
+            _path: doc.path,
+            ...newData
         };
         this.saveHistory(_companyId, collection, savedData);
         return savedData;
