@@ -372,22 +372,23 @@ class Servlet {
         if (typeof _id === 'string') {
             _id = _id.trim();
         }
-        delete newData._path;
-        delete newData._id;
-        delete newData._pathCollection;
+        let dataToUpdate = {...newData};
+        delete dataToUpdate._path;
+        delete dataToUpdate._id;
+        delete dataToUpdate._pathCollection;
 
         let doc = _id ?
-            await this.db.collection(_path).doc(_id).set(newData, {merge: !!merge}) :
-            await this.db.collection(_path).add(newData);
+            await this.db.collection(_path).doc(_id).set(dataToUpdate, {merge: !!merge}) :
+            await this.db.collection(_path).add(dataToUpdate);
 
         let savedData = _id ? {
             _id: _id,
             _path: `${_path}/${_id}`,
-            ...newData
+            ...dataToUpdate
         } : {
             _id: doc.id,
             _path: doc.path,
-            ...newData
+            ...dataToUpdate
         };
         this.saveHistory(_companyId, collection, savedData);
         return savedData;
@@ -429,13 +430,19 @@ class Servlet {
      * @returns {Promise<DatabaseDocument>}
      */
     async updateDocumentByPath(_path, newData, merge) {
-        delete newData._path;
-        delete newData._id;
-        delete newData._pathCollection;
+        let dataToUpdate = {...newData};
+        delete dataToUpdate._path;
+        delete dataToUpdate._id;
+        delete dataToUpdate._pathCollection;
 
-        let doc = await this.db.doc(_path).set(newData, {merge: !!merge});
-        let savedData = {_path, ...newData};
-        this.saveHistoryByPath(_path, newData);
+
+        let doc = await this.db.doc(_path).set(dataToUpdate, {merge: !!merge});
+        let savedData = {
+            _id: _path.split("/").at(-1),
+            _path: _path,
+            ...dataToUpdate
+        };
+        this.saveHistoryByPath(_path, dataToUpdate);
         return savedData;
     }
 
