@@ -66,16 +66,20 @@ const requestParam = (req, res, next) => {
 
     req.param = new Proxy(req, {
         get(target, name) {
+            let r = undefined;
             if (target.body[name] !== undefined) {
-                return target.body[name]
+                r = target.body[name]
             }
             if (target.query[name] !== undefined) {
-                return target.query[name]
+                r = target.query[name]
             }
             if (target.params[name] !== undefined) {
-                return target.params[name]
+                r = target.params[name]
             }
-            return undefined;
+            if (typeof r === 'string') {
+                r = r.trim();
+            }
+            return r;
         },
         set(target, name, value) {
             if (target.body[name] !== undefined) {

@@ -369,8 +369,17 @@ class Servlet {
         newData = newData.uniqueId ? newData.data : newData;
         newData = this.cleanObject(newData);
         let _path = _companyId !== 'default' && _companyId !== '' ? `company/${_companyId}/${collection}` : collection;
-        newData._pathCollection = _path;
-        let doc = _id ? await this.db.collection(_path).doc(_id).set(newData, {merge: !!merge}) : await this.db.collection(_path).add(newData);
+        if (typeof _id === 'string') {
+            _id = _id.trim();
+        }
+        delete newData._path;
+        delete newData._id;
+        delete newData._pathCollection;
+
+        let doc = _id ?
+            await this.db.collection(_path).doc(_id).set(newData, {merge: !!merge}) :
+            await this.db.collection(_path).add(newData);
+
         let savedData = _id ? {
             _id: _id,
             _path: `${_path}/${_id}`,
@@ -420,6 +429,10 @@ class Servlet {
      * @returns {Promise<DatabaseDocument>}
      */
     async updateDocumentByPath(_path, newData, merge) {
+        delete newData._path;
+        delete newData._id;
+        delete newData._pathCollection;
+
         let doc = await this.db.doc(_path).set(newData, {merge: !!merge});
         let savedData = {_path, ...newData};
         this.saveHistoryByPath(_path, newData);
