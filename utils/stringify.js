@@ -102,7 +102,7 @@ const stringify = (data, indent) => {
 
                 for (let x = 0; x < dimension; x++) {
 
-                    let tmp = _stringify(data[x + y * dimension]);
+                    let tmp = stringify(data[x + y * dimension]);
                     if (tmp.length < max) {
                         str += _WHITESPACE.substr(0, max - tmp.length);
                     }
@@ -136,7 +136,7 @@ const stringify = (data, indent) => {
                     str += ' ';
                 }
 
-                str += _stringify(data[d]);
+                str += stringify(data[d]);
 
                 if (d < dl - 1) {
                     str += ', ';
@@ -155,7 +155,7 @@ const stringify = (data, indent) => {
 
             for (let d = 0, dl = data.length; d < dl; d++) {
 
-                str += _stringify(data[d], '\t' + indent);
+                str += stringify(data[d], '\t' + indent);
 
                 if (d < dl - 1) {
                     str += ',';
@@ -199,7 +199,7 @@ const stringify = (data, indent) => {
                 let key = keys[k];
 
                 str += '\t' + indent + '"' + key + '": ';
-                str += _stringify(data[key], '\t' + indent).trim();
+                str += stringify(data[key], '\t' + indent).trim();
 
                 if (k < kl - 1) {
                     str += ',';

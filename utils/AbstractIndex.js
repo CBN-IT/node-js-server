@@ -1,5 +1,5 @@
 const GetConfigs = require('./GetConfigs.js');
-const {_stringify} = require('./Utils.js');
+const {stringify} = require('./stringify.js');
 const fs = require("fs");
 const path = require("path");
 const dayjs = require("dayjs");
@@ -45,7 +45,7 @@ class AbstractIndex extends GetConfigs {
         }
         let index = fs.readFileSync(path.join(global.projectRoot, "web", this.indexFile), 'utf8');
         let data = await this._getData();
-        this.res.send(index.replace('"data_to_replace"', _stringify(data)));
+        this.res.send(index.replace('"data_to_replace"', stringify(data)));
     }
 
     async _getData() {

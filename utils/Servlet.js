@@ -357,10 +357,11 @@ class Servlet {
         });
 
         if (this.xssFilter) {
+            let sanitizeXSS = this.sanitizeXSS.bind(this)
             this.req.param = new Proxy(this.req, {
                 get(target, name) {
                     let dirty = target.paramNoXSSCheck[name];
-                    return this.sanitizeXSS(dirty)
+                    return sanitizeXSS(dirty)
                 },
                 set(target, name, value) {
                     target.paramNoXSSCheck[name] = value;
