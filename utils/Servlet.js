@@ -244,10 +244,7 @@ class Servlet {
      * @private
      */
     _isAdmin(user) {
-        return user !== null && (
-            user.email === 'octavianvoloaca@gmail.com' ||
-            user.email === 'bogdan.nourescu@cbn-it.ro'
-        );
+        return false;
     }
 
     /**
