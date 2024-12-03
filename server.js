@@ -37,6 +37,7 @@ function addMappings(app, arr) {
         app.all(servlet.url, async (req, res) => {
             let processor = new servlet(req, res);
             try {
+                processor.checkXSS();
                 await processor.checkLogin();
                 await processor.validate();
                 let value = await Promise.race([
@@ -114,7 +115,6 @@ function startAppAndServer(){
 
     app.use(multer.any());
     app.use(sendUploadToGCS(`${process.env.GOOGLE_CLOUD_PROJECT}.appspot.com`));
-    app.use(requestParam);
 
     let server = app.listen(PORT, () => {
         console.log(`Server listening on port ${PORT}...`);

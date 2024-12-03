@@ -2,6 +2,9 @@ const {AuthenticationError, AuthorizationError, RequiredFieldError, ValidationEr
 const {getCircularReplacer} = require('./Utils');
 const admin = require('firebase-admin');
 const {BigQuery} = require('@google-cloud/bigquery');
+const {unflat} = require("./unflat");
+const sanitizeHtml = require("sanitize-html");
+
 
 /**
  * A database document
@@ -63,15 +66,22 @@ class Servlet {
      * @type {Array<String>}
      */
     requiredParams = [];
+
+    /**
+     * Should the request be filtered for HTML tags and encode them?
+     * @type {boolean}
+     */
+    xssFilter = true;
+
     /**
      *
-     * @param {Express.Request} req
+     * @param {Express.Request & {log:CBNLogger}} req
      * @param {Express.Response} res
      */
     constructor(req, res) {
         /** @type {Express.Response} */
         this.res = res;
-        /** @type {Express.Request} */
+        /** @type {Express.Request & {param:ParsedQs,paramNoXSSCheck: ParsedQs,log:CBNLogger }} */
         this.req = req;
         /** @type {CBNLogger} */
         this.logger = this.req.log;
@@ -256,6 +266,125 @@ class Servlet {
             return true;
         }
         throw new RequiredFieldError("Invalid params: " + missingParams.join(", "));
+    }
+
+
+    sanitizeXSS_String(dirty) {
+        return sanitizeHtml(dirty, {
+            allowedTags: [],
+            allowedAttributes: false,
+            disallowedTagsMode: "escape",
+            parser: {
+                lowerCaseTags: false,
+                lowerCaseAttributeNames: false
+            }
+        });
+    }
+    sanitizeXSS_Alert(dirty, clean) {
+    }
+
+    sanitizeXSS_Array(obj) {
+        return obj.map((val) => this.sanitizeXSS(val))
+    }
+
+    sanitizeXSS_Object(obj) {
+        return Object.fromEntries(Object.entries(obj).map(([key, val]) => [key, this.sanitizeXSS(val)]))
+    }
+
+    sanitizeXSS(dirty) {
+        if (dirty === null || dirty === undefined) {
+            return dirty;
+        }
+        if (typeof dirty === 'string') {
+            let clean = this.sanitizeXSS_String(dirty);
+            if (clean !== dirty) {
+                this.sanitizeXSS_Alert(dirty, clean)
+            }
+        }
+        if (Array.isArray(dirty)) {
+            return this.sanitizeXSS_Array(dirty);
+        }
+        if (typeof dirty === 'object') {
+            return this.sanitizeXSS_Object(dirty);
+        }
+
+        return dirty;
+    }
+
+    checkXSS(){
+        unflat(this.req.body);
+        unflat(this.req.query);
+        unflat(this.req.params);
+
+        this.req.paramNoXSSCheck = new Proxy(this.req, {
+            get(target, name) {
+                if (target.body[name] !== undefined) {
+                    return target.body[name]
+                }
+                if (target.query[name] !== undefined) {
+                    return target.query[name]
+                }
+                if (target.params[name] !== undefined) {
+                    return target.params[name]
+                }
+                return undefined;
+            },
+            set(target, name, value) {
+                if (target.body[name] !== undefined) {
+                    target.body[name] = value;
+                } else if (target.query[name] !== undefined) {
+                    target.query[name] = value;
+                } else if (target.params[name] !== undefined) {
+                    target.params[name] = value;
+                } else {
+                    target.body[name] = value;
+                }
+                return true;
+            },
+            has(target, name) {
+                return target.body[name] !== undefined || target.query[name] !== undefined || target.params[name] !== undefined;
+            },
+            getOwnPropertyDescriptor(target, name) {
+                return {
+                    enumerable: true,
+                    configurable: true,
+                };
+            },
+            ownKeys(target) {
+                return [
+                    ...Object.keys(target.params),
+                    ...Object.keys(target.query),
+                    ...Object.keys(target.body)
+                ]
+            },
+        });
+
+        if (this.xssFilter) {
+            this.req.param = new Proxy(this.req, {
+                get(target, name) {
+                    let dirty = target.paramNoXSSCheck[name];
+                    return this.sanitizeXSS(dirty)
+                },
+                set(target, name, value) {
+                    target.paramNoXSSCheck[name] = value;
+                    return true;
+                },
+                has(target, name) {
+                    return target.paramNoXSSCheck[name]
+                },
+                getOwnPropertyDescriptor(target, name) {
+                    return {
+                        enumerable: true,
+                        configurable: true,
+                    };
+                },
+                ownKeys(target) {
+                    return Object.keys(target.paramNoXSSCheck)
+                },
+            });
+        } else {
+            this.req.param = this.req.paramNoXSSCheck
+        }
     }
 
     /**

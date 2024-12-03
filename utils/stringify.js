@@ -1,4 +1,8 @@
-const _stringify = (data, indent) => {
+const _WHITESPACE = new Array(512).fill(' ').join('');
+const _format_date = function (n) {
+    return n < 10 ? '0' + n : '' + n;
+};
+const stringify = (data, indent) => {
     indent = typeof indent === 'string' ? indent : '';
     let str = '';
     if (typeof data === 'boolean'
