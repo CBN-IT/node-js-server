@@ -45,7 +45,12 @@ function sanitizeXSS(obj) {
     if (typeof obj === 'string') {
         return sanitizeHtml(obj, {
             allowedTags: [],
-            allowedAttributes: {}
+            allowedAttributes: false,
+            disallowedTagsMode: "escape",
+            parser: {
+                lowerCaseTags: false,
+                lowerCaseAttributeNames: false
+            }
         });
     } else if (Array.isArray(obj)) {
         for (let i = 0; i < obj.length; i++) {
