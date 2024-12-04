@@ -85,7 +85,6 @@ class Servlet {
         this.req = req;
         /** @type {CBNLogger} */
         this.logger = this.req.log;
-        this._companyId = this.req.param._companyId;
         this._initializeAppAndDatabase();
         this.logger.tag("companyId", this._companyId);
     }
@@ -398,6 +397,7 @@ class Servlet {
      * @throws {AuthenticationError|AuthorizationError}
      */
     async checkLogin() {
+        this._companyId = this.req.param._companyId;
         if (this.requiredLogin) {
             let account = await this.getAccount();
             if (account === null) {
