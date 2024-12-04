@@ -37,7 +37,6 @@ function addMappings(app, arr) {
         app.all(servlet.url, async (req, res) => {
             let processor = new servlet(req, res);
             try {
-                processor.checkXSS();
                 await processor.checkLogin();
                 await processor.validate();
                 let value = await Promise.race([
