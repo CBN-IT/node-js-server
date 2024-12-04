@@ -277,7 +277,14 @@ class Servlet {
             }
         });
     }
+
     sanitizeXSS_Alert(dirty, clean) {
+        if (process.env.XSS === "error") {
+            throw new ValidationError("XSS validation")
+        }
+        if (process.env.XSS === "logout") {
+            throw new AuthorizationError("XSS validation")
+        }
     }
 
     sanitizeXSS_Array(obj) {
