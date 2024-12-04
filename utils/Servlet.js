@@ -71,7 +71,9 @@ class Servlet {
      * Should the request be filtered for HTML tags and encode them?
      * @type {boolean}
      */
-    xssFilter = true;
+    get xssFilter() {
+        return true;
+    }
 
     /**
      *
@@ -83,6 +85,9 @@ class Servlet {
         this.res = res;
         /** @type {Express.Request & {param:ParsedQs,paramNoXSSCheck: ParsedQs,log:CBNLogger }} */
         this.req = req;
+        this.checkXSS();
+        this._companyId = this.req.param._companyId;
+
         /** @type {CBNLogger} */
         this.logger = this.req.log;
         this._initializeAppAndDatabase();
@@ -362,12 +367,11 @@ class Servlet {
             },
         });
 
-        if (this.xssFilter) {
             let sanitizeXSS = this.sanitizeXSS.bind(this)
             this.req.param = new Proxy(this.req, {
                 get(target, name) {
                     let dirty = target.paramNoXSSCheck[name];
-                    return sanitizeXSS(dirty)
+                return this.xssFilter ? sanitizeXSS(dirty) : dirty;
                 },
                 set(target, name, value) {
                     target.paramNoXSSCheck[name] = value;
@@ -386,9 +390,6 @@ class Servlet {
                     return Object.keys(target.paramNoXSSCheck)
                 },
             });
-        } else {
-            this.req.param = this.req.paramNoXSSCheck
-        }
     }
 
     /**
@@ -397,7 +398,6 @@ class Servlet {
      * @throws {AuthenticationError|AuthorizationError}
      */
     async checkLogin() {
-        this._companyId = this.req.param._companyId;
         if (this.requiredLogin) {
             let account = await this.getAccount();
             if (account === null) {
