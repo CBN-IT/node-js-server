@@ -1,5 +1,5 @@
 function unflat(obj) {
-    let entry = Object.entries(obj || {});
+    let entry = Object.entries(obj);
     for (let [key, value] of entry) {
         if (key.includes(".")) {
             let keys = key.split(/[.]+/g);
