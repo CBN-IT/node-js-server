@@ -4,7 +4,7 @@
  * @returns Array<String>
  */
 function getAsList(val) {
-    if(val === null || val === undefined){
+    if(val === null || val === undefined || val === ""){
         return [];
     }
     return (Array.isArray(val) ? val : [val]);
