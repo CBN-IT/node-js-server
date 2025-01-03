@@ -367,29 +367,29 @@ class Servlet {
             },
         });
 
-            let sanitizeXSS = this.sanitizeXSS.bind(this)
-            this.req.param = new Proxy(this.req, {
-                get(target, name) {
-                    let dirty = target.paramNoXSSCheck[name];
-                return this.xssFilter ? sanitizeXSS(dirty) : dirty;
-                },
-                set(target, name, value) {
-                    target.paramNoXSSCheck[name] = value;
-                    return true;
-                },
-                has(target, name) {
-                    return target.paramNoXSSCheck[name]
-                },
-                getOwnPropertyDescriptor(target, name) {
-                    return {
-                        enumerable: true,
-                        configurable: true,
-                    };
-                },
-                ownKeys(target) {
-                    return Object.keys(target.paramNoXSSCheck)
-                },
-            });
+        let that = this;
+        this.req.param = new Proxy(this.req, {
+            get(target, name) {
+                let dirty = target.paramNoXSSCheck[name];
+                return that.xssFilter ? that.sanitizeXSS(dirty) : dirty;
+            },
+            set(target, name, value) {
+                target.paramNoXSSCheck[name] = value;
+                return true;
+            },
+            has(target, name) {
+                return target.paramNoXSSCheck[name]
+            },
+            getOwnPropertyDescriptor(target, name) {
+                return {
+                    enumerable: true,
+                    configurable: true,
+                };
+            },
+            ownKeys(target) {
+                return Object.keys(target.paramNoXSSCheck)
+            },
+        });
     }
 
     /**
