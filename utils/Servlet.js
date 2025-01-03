@@ -367,18 +367,17 @@ class Servlet {
             },
         });
 
-        let that = this;
-        this.req.param = new Proxy(this.req, {
+        this.req.param = new Proxy(this, {
             get(target, name) {
-                let dirty = target.paramNoXSSCheck[name];
-                return that.xssFilter ? that.sanitizeXSS(dirty) : dirty;
+                let dirty = target.req.paramNoXSSCheck[name];
+                return target.xssFilter ? target.sanitizeXSS(dirty) : dirty;
             },
             set(target, name, value) {
-                target.paramNoXSSCheck[name] = value;
+                target.req.paramNoXSSCheck[name] = value;
                 return true;
             },
             has(target, name) {
-                return target.paramNoXSSCheck[name]
+                return target.req.paramNoXSSCheck[name]
             },
             getOwnPropertyDescriptor(target, name) {
                 return {
@@ -387,7 +386,7 @@ class Servlet {
                 };
             },
             ownKeys(target) {
-                return Object.keys(target.paramNoXSSCheck)
+                return Object.keys(target.req.paramNoXSSCheck)
             },
         });
     }
