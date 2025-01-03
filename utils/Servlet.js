@@ -308,6 +308,7 @@ class Servlet {
             if (clean !== dirty) {
                 this.sanitizeXSS_Alert(dirty, clean)
             }
+            return clean;
         }
         if (Array.isArray(dirty)) {
             return this.sanitizeXSS_Array(dirty);
