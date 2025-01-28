@@ -279,7 +279,7 @@ class Servlet {
                 lowerCaseTags: false,
                 lowerCaseAttributeNames: false
             }
-        });
+        }).replace(/&amp;/g, "&");
     }
 
     sanitizeXSS_Alert(dirty, clean) {
@@ -371,7 +371,7 @@ class Servlet {
         this.req.param = new Proxy(this, {
             get(target, name) {
                 let dirty = target.req.paramNoXSSCheck[name];
-                return target.xssFilter && !["_companyId"].includes(name) ? target.sanitizeXSS(dirty) : dirty;
+                return target.xssFilter? target.sanitizeXSS(dirty) : dirty;
             },
             set(target, name, value) {
                 target.req.paramNoXSSCheck[name] = value;
