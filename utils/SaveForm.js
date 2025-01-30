@@ -38,11 +38,13 @@ class SaveForm extends Servlet {
 
         let newData = {_deleted: null};
         config.elements.forEach(field => {
+            let requestData = field.noXSSCheck ? (this.req.paramNoXSSCheck ?? reqData) : reqData
+
             if (field['dbType'] === 'address') {
-                this._processAdress(newData, field, reqData);
+                this._processAdress(newData, field, requestData);
                 return;
             }
-            let value = this._getValue(field.multiple, reqData[field.name], field.type);
+            let value = this._getValue(field.multiple, requestData[field.name], field.type);
             if (value !== undefined) {
                 switch (field['dbType']) {
                     case 'string':
@@ -78,7 +80,7 @@ class SaveForm extends Servlet {
                         break;
                 }
                 if (field.type === 'select' && field['saveLabel']) {
-                    newData[`${field.name}_label`] = this._getValue(field.multiple, reqData[`${field.name}_label`], field.type) ?? "";
+                    newData[`${field.name}_label`] = this._getValue(field.multiple, requestData[`${field.name}_label`], field.type) ?? "";
                 }
             }
         });

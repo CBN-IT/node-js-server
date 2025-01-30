@@ -273,7 +273,7 @@ class Servlet {
     sanitizeXSS_String(dirty) {
         return sanitizeHtml(dirty, {
             allowedTags: [],
-            allowedAttributes: false,
+            allowedAttributes: {},
             disallowedTagsMode: "escape",
             parser: {
                 lowerCaseTags: false,
