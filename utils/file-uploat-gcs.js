@@ -28,7 +28,7 @@ function sendUploadToGCS(bucketName) {
         const prefix = today+"/"+Date.now()+"_";
         let promiseArr = [];
         for (let i = 0; i < req.files.length; i++) {
-            let fileName = decodeURI(req.files[i].originalname);
+            let fileName = decodeURIComponent(req.files[i].originalname);
             const gcsName = prefix + removeDiacritics(fileName);
             const file = bucket.file(gcsName);
             promiseArr.push( file.save(req.files[i].buffer, {
