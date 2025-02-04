@@ -1,7 +1,7 @@
 "use strict";
 const {Storage} = require('@google-cloud/storage');
 const storage = new Storage();
-
+const {removeDiacritics} = require('./removeDiacritics.js');
 const dayjs = require("dayjs");
 const Multer = require('multer');
 const {unflat} = require("./unflat");
@@ -28,9 +28,9 @@ function sendUploadToGCS(bucketName) {
         const prefix = today+"/"+Date.now()+"_";
         let promiseArr = [];
         for (let i = 0; i < req.files.length; i++) {
-            const gcsName = prefix + req.files[i].originalname;
+            let fileName = decodeURI(req.files[i].originalname);
+            const gcsName = prefix + removeDiacritics(fileName);
             const file = bucket.file(gcsName);
-
             promiseArr.push( file.save(req.files[i].buffer, {
                 metadata: {
                     contentType: req.files[i].mimetype
@@ -40,17 +40,16 @@ function sendUploadToGCS(bucketName) {
             }));
             req.files[i].cloudStorageObject = gcsName;
             req.files[i].cloudStoragePublicUrl = getPublicUrl(bucketName,gcsName);
-            let fieldName = req.files[i].fieldname;
             let publicUrl = req.files[i].cloudStoragePublicUrl;
             let fileObj = {
-                label: req.files[i].originalname,
+                label: fileName,
                 size:req.files[i].size,
                 type: req.files[i].mimetype,
                 url:publicUrl
             };
 
             let body = req.body;
-
+            let fieldName = req.files[i].fieldname;
             if (fieldName.match(/^([^.]+)\.([0-9]+)\.([^.]+)$/)) {
                 let [n, idx, prop] = fieldName.split(".");
                 if (!(body[n] instanceof Array)) {
