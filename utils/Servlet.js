@@ -367,29 +367,32 @@ class Servlet {
                 ]
             },
         });
-
-        this.req.param = new Proxy(this, {
-            get(target, name) {
-                let dirty = target.req.paramNoXSSCheck[name];
-                return target.xssFilter? target.sanitizeXSS(dirty) : dirty;
-            },
-            set(target, name, value) {
-                target.req.paramNoXSSCheck[name] = value;
-                return true;
-            },
-            has(target, name) {
-                return target.req.paramNoXSSCheck[name]
-            },
-            getOwnPropertyDescriptor(target, name) {
-                return {
-                    enumerable: true,
-                    configurable: true,
-                };
-            },
-            ownKeys(target) {
-                return Object.keys(target.req.paramNoXSSCheck)
-            },
-        });
+        if (process.env.XSS === "noFilter") {
+            this.req.param = this.req.paramNoXSSCheck;
+        } else {
+            this.req.param = new Proxy(this, {
+                get(target, name) {
+                    let dirty = target.req.paramNoXSSCheck[name];
+                    return target.xssFilter ? target.sanitizeXSS(dirty) : dirty;
+                },
+                set(target, name, value) {
+                    target.req.paramNoXSSCheck[name] = value;
+                    return true;
+                },
+                has(target, name) {
+                    return target.req.paramNoXSSCheck[name]
+                },
+                getOwnPropertyDescriptor(target, name) {
+                    return {
+                        enumerable: true,
+                        configurable: true,
+                    };
+                },
+                ownKeys(target) {
+                    return Object.keys(target.req.paramNoXSSCheck)
+                },
+            });
+        }
     }
 
     /**
