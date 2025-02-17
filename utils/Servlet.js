@@ -613,6 +613,9 @@ class Servlet {
             if (newData[key] === undefined) {
                 delete newData[key];
             }
+            if(newData[key] && typeof newData[key] === "object"){
+                this.cleanObject(newData[key])
+            }
         });
         return newData;
     }
@@ -747,9 +750,10 @@ class Servlet {
         if (this._userHistory.length === 0) {
             return [];
         }
-        console.log('Saving user history', this._userHistory);
+
         return Promise.all(this._userHistory.map(async (v)=>{
-            this.cleanObject(v)
+            this.cleanObject(v);
+            console.log('Saving user history', v);
             let doc = await this.db.collection(`company/${this._companyId}/userHistory`).add(v);
             return {
                 _id: doc.id,
