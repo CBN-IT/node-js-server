@@ -88,6 +88,8 @@ function addMappings(app, arr) {
                     req.log.d(JSON.parse(JSON.stringify(req.param)));
                 }
                 processor.sendAsJson(JSON.stringify(error));
+            } finally {
+                await processor.saveUserHistory();
             }
         });
     });

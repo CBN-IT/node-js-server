@@ -68,6 +68,12 @@ class Servlet {
     requiredParams = [];
 
     /**
+     * We store the actions the user did to save them in the DB
+     * @type {[]}
+     */
+    _userHistory =[]
+
+    /**
      * Should the request be filtered for HTML tags and encode them?
      * @type {boolean}
      */
@@ -501,7 +507,7 @@ class Servlet {
      * @param merge
      * @returns {Promise<DatabaseDocument>}
      */
-    async updateDocument(_companyId, collection, _id, newData, merge) {
+    async updateDocument(_companyId, collection, _id, newData, merge=false) {
         _id = !_id && newData.uniqueId ? newData.data[newData.uniqueId] : _id;
         newData = newData.uniqueId ? newData.data : newData;
         newData = this.cleanObject(newData);
@@ -597,7 +603,8 @@ class Servlet {
     }
 
     /**
-     *
+     * Removes the undefined properties from object
+     * Warning: this mutaes the Object
      * @param newData
      * @returns {*}
      */
@@ -725,6 +732,31 @@ class Servlet {
             query = query.select(...fields)
         }
         return this.processDocuments(await query.get());
+    }
+
+
+    async addUserHistory(type, params){
+        this._userHistory.push({
+            type,
+            params,
+            user: (await this.getUser()).email,
+            date: new Date()
+        })
+    }
+    async saveUserHistory(){
+        if (this._userHistory.length === 0) {
+            return [];
+        }
+        console.log('Saving user history', this._userHistory);
+        return Promise.all(this._userHistory.map(async (v)=>{
+            this.cleanObject(v)
+            let doc = await this.db.collection(`company/${this._companyId}/userHistory`).add(v);
+            return {
+                _id: doc.id,
+                _path: doc.path,
+                ...v
+            };
+        }))
     }
 }
 
