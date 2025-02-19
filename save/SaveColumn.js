@@ -13,7 +13,7 @@ class SaveColumn extends GetConfigs {
         //test if the new data has changed. If it didn't change, don't save it
         let columns = await this._getForms('server/columns', collection, _companyId, false);
         let oldCode = JSON.stringify(columns[_id].code);//getForms return the code as an object
-        let code = JSON.stringify(JSON.parse(this.req.param['code']));//to remove whitespace
+        let code = JSON.stringify(JSON.parse(this.req.paramNoXSSCheck['code']));//to remove whitespace
         if (code === oldCode) {
             throw new ValidationError("Setarile de coloana nu au fost modificate.")
         }

@@ -198,12 +198,11 @@ class SaveForm extends Servlet {
                 }
         });
 
-
         formsDefault.forEach(form => {
-            formsFromFile[form.collection] = justJSON ? JSON.parse(form.code) : form;
+            formsFromFile[form._id] = justJSON ? JSON.parse(form.code) : form;
         });
         forms.forEach(form => {
-            formsFromFile[form.collection] = justJSON ? JSON.parse(form.code) : form;
+            formsFromFile[form._id] = justJSON ? JSON.parse(form.code) : form;
         });
 
         return formsFromFile;
