@@ -742,7 +742,7 @@ class Servlet {
         this._userHistory.push({
             type,
             params,
-            user: (await this.getUser()).email,
+            user: (await this.getUser())?.email ?? "",
             date: new Date()
         })
     }
