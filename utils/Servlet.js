@@ -662,10 +662,7 @@ class Servlet {
      */
     async getDocumentByPath(_path) {
         let doc = await this.db.doc(_path).get();
-        if (doc.exists) {
-            return {_id: doc.id, ...doc.data(), _path: _path};
-        }
-        return null;
+        return this._documentSnapshotToEntity(doc);
     }
 
     /**
@@ -693,9 +690,20 @@ class Servlet {
         }
         let docRefs = _paths.map(_path => this.db.doc(_path));
         let snapshot = await this.db.getAll(...docRefs);
-        return snapshot.map(doc => {
-            return {_id: doc.id, _path: doc.ref.path, ...doc.data()}
-        });
+        return snapshot.map(this._documentSnapshotToEntity);
+    }
+
+    /**
+     * Parse DocumentSnapshot and transform it into Entity (that has _id, _path and all the data)
+     * @param doc
+     * @returns {(*&{_id, _path})|null}
+     * @private
+     */
+    _documentSnapshotToEntity(doc){
+        if (!doc.exists) {
+            return null;
+        }
+        return {_id: doc.id, _path: doc.ref.path, ...doc.data()}
     }
 
     /**
