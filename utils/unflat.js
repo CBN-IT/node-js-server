@@ -5,7 +5,7 @@ function unflat(obj) {
             let keys = key.split(/[.]+/g);
             let o = obj;
             for (let i = 1; i < keys.length; i++) {
-                if (keys[i].match(/[0-9]+/g)) {
+                if (keys[i].match(/^[0-9]+$/g)) {
                     if (o[keys[i - 1]] === undefined) {
                         o[keys[i - 1]] = [];
                     }
@@ -13,6 +13,11 @@ function unflat(obj) {
                 } else {
                     if (o[keys[i - 1]] === undefined) {
                         o[keys[i - 1]] = {};
+                    } else if (o[keys[i - 1]] instanceof Array) {
+                        //console.log("making object from array cause not all keys are array like", keys[i - 1])
+                        o[keys[i - 1]] = {
+                            ...o[keys[i - 1]]
+                        }
                     }
                     o = o[keys[i - 1]];
                 }
