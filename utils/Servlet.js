@@ -4,6 +4,7 @@ const admin = require('firebase-admin');
 const {BigQuery} = require('@google-cloud/bigquery');
 const {unflat} = require("./unflat");
 const sanitizeHtml = require("sanitize-html");
+const {firestore} = require("firebase-admin");
 
 
 /**
@@ -488,6 +489,9 @@ class Servlet {
      */
     _processData(data) {
         Object.entries(data).forEach(([key, value]) => {
+            if (value instanceof firestore.Timestamp) {
+                data[key] = value.toDate();
+            }
             let keys = key.split('.');
             if (keys.length > 1) {
                 data[keys[0]] = data[keys[0]] ? data[keys[0]] : {};
