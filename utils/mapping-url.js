@@ -5,6 +5,11 @@ function getServlets(folderPaths) {
     let servlets = [];
     folderPaths.forEach(folderPath => {
         fs.readdirSync(folderPath).forEach(function (file) {
+            if (!file.endsWith(".js")) {
+                console.log(`SKIPPED file !!!!!!!!!!!!!! ${folderPath}/${file}`)
+                return;
+            }
+
             let servlet = require(`${folderPath}/${file}`);
             if (servlet.prototype instanceof Servlet && servlet.url !== null) {
                 servlets.push(servlet);
