@@ -631,8 +631,22 @@ class Servlet {
      * @param _id
      * @returns {Promise<DatabaseDocument>}
      */
-    deleteDocument(_companyId, collection, _id) {
+    async deleteDocument(_companyId, collection, _id) {
         return this.updateDocument(_companyId, collection, _id, {_deleted: new Date()}, true);
+    }
+
+    async permanentlyDeleteDocument(_companyId, collection, _id){
+        if (_id === null || _id === undefined || _id === "") {
+            return null;
+        }
+        let _pathCollection = _companyId !== 'default' && _companyId !== '' ? `company/${_companyId}/${collection}` : collection;
+        let _path = `${_pathCollection}/${_id}`
+        return this.permanentlyDeleteDocumentByPath(_path)
+    }
+
+    async permanentlyDeleteDocumentByPath(_path){
+        let doc = await this.db.doc(_path);
+        return doc.delete()
     }
 
     /**
