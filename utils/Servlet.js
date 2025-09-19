@@ -141,22 +141,8 @@ class Servlet {
      */
     async getUser() {
         if (this._user === undefined) {
-            const sessionCookie = (this.req.cookies && this.req.cookies.session) || '';
-            if (sessionCookie === "") {
-                this._user = null;
-            } else if (this.req.headers["x-appengine-taskname"] !== undefined) {
-                this._user = {
-                    email: "task@" + (process.env.GOOGLE_CLOUD_PROJECT ?? "local") + ".iam.gserviceaccount.com",
-                    uid: "task"
-                }
-
-            } else if (this.req.headers["x-appengine-cron"] !== undefined) {
-                this._user = {
-                    email: "cron@" + (process.env.GOOGLE_CLOUD_PROJECT ?? "local") + ".iam.gserviceaccount.com",
-                    uid: "cron"
-                }
-
-            } else {
+            const sessionCookie = this.req.cookies?.session ?? '';
+            if (sessionCookie !== "") {
                 try {
                     this._user = await admin.auth().verifySessionCookie(sessionCookie);
                 } catch (e) {
@@ -167,6 +153,18 @@ class Servlet {
                     });
                     throw new AuthenticationError(e.message);
                 }
+            } else if (this.req.headers["x-appengine-taskname"] !== undefined) {
+                this._user = {
+                    email: "task@" + (process.env.GOOGLE_CLOUD_PROJECT ?? "local") + ".iam.gserviceaccount.com",
+                    uid: "task"
+                }
+            } else if (this.req.headers["x-appengine-cron"] !== undefined) {
+                this._user = {
+                    email: "cron@" + (process.env.GOOGLE_CLOUD_PROJECT ?? "local") + ".iam.gserviceaccount.com",
+                    uid: "cron"
+                }
+            } else {
+                this._user = null;
             }
         }
         this.logger.tag("user", this._user ? this._user.email : null);
