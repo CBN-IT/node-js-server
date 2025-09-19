@@ -144,6 +144,18 @@ class Servlet {
             const sessionCookie = (this.req.cookies && this.req.cookies.session) || '';
             if (sessionCookie === "") {
                 this._user = null;
+            } else if (this.req.headers["x-appengine-taskname"] !== undefined) {
+                this._user = {
+                    email: "task@" + (process.env.GOOGLE_CLOUD_PROJECT ?? "local") + ".iam.gserviceaccount.com",
+                    uid: "task"
+                }
+
+            } else if (this.req.headers["x-appengine-cron"] !== undefined) {
+                this._user = {
+                    email: "cron@" + (process.env.GOOGLE_CLOUD_PROJECT ?? "local") + ".iam.gserviceaccount.com",
+                    uid: "cron"
+                }
+
             } else {
                 try {
                     this._user = await admin.auth().verifySessionCookie(sessionCookie);
@@ -255,7 +267,10 @@ class Servlet {
      * @private
      */
     _isAdmin(user) {
-        return false;
+        return [
+            "task@" + (process.env.GOOGLE_CLOUD_PROJECT ?? "local") + ".iam.gserviceaccount.com",
+            "cron@" + (process.env.GOOGLE_CLOUD_PROJECT ?? "local") + ".iam.gserviceaccount.com"
+        ].includes(user.email);
     }
 
     /**
