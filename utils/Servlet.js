@@ -792,7 +792,7 @@ class Servlet {
 
         return Promise.all(this._userHistory.map(async (v)=>{
             this.cleanObject(v);
-            console.log('Saving user history', v);
+            //console.log('Saving user history', v);
             let doc = await this.db.collection(`company/${this._companyId}/userHistory`).add(v);
             return {
                 _id: doc.id,
