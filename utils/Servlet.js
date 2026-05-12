@@ -512,6 +512,10 @@ class Servlet {
                 delete data[key];
             }
         });
+        delete data._path;
+        delete data._id;
+        delete data._pathCollection;
+
         return data;
     }
 
