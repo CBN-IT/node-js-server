@@ -243,7 +243,7 @@ class Servlet {
                 if (_companyId) {
                     for (let i = 0; i < accounts.length; i++) {
                         if (accounts[i].accountType === "SuperAdmin") {
-                            this._account = this._getSuperAdminCont({...user}, _companyId);
+                            this._account = {...user, ...accounts[i], _companyId};
                             return this._account;
                         } else if (accounts[i]._companyId === _companyId) {
                             this._account = accounts[i];
